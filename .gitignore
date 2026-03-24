@@ -1,0 +1,6 @@
+# logs 및 screenshots 내부 파일 무시
+reports/logs/*
+!reports/logs/.gitkeep
+
+reports/screenshots/*
+!reports/screenshots/.gitkeep
