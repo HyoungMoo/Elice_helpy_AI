@@ -14,7 +14,7 @@ class LoginPage:
     def go_to_login_page(self):
         self.driver.get(self.URL)
 
-    def login(self, user_key="user_2"):
+    def login(self, user_key="user_1"):
         user = self.credentials[user_key]
         self.driver.find_element(By.NAME, "loginId").send_keys(user["email"])
         self.driver.find_element(By.NAME, "password").send_keys(user["password"])
