@@ -12,10 +12,6 @@ venv/
 .vscode/
 .idea/
 
-# OS별 불필요 파일
-.DS_Store
-Thumbs.db
-
 # 로그 파일
 *.log
 
@@ -28,3 +24,6 @@ reports/logs/*
 
 reports/screenshots/*
 !reports/screenshots/.gitkeep
+
+# 민감정보
+src/resources/credentials.json
