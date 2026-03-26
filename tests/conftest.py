@@ -17,5 +17,10 @@ def driver():
 def logged_in_driver(driver):
     login_page = LoginPage(driver)
     login_page.go_to_login_page()
-    login_page.login("user_2")  # 여기서 원하는 계정 선택
+    login_page.login("user_3")  # 여기서 원하는 계정 선택
+    return driver
+
+@pytest.fixture
+def fresh_driver(driver):
+    
     return driver
