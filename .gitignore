@@ -26,4 +26,4 @@ reports/screenshots/*
 !reports/screenshots/.gitkeep
 
 # 민감정보
-src/resources/credentials.json
+credentials.json
