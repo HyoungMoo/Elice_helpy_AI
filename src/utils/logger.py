@@ -5,7 +5,7 @@ def setup_logger(name):
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
 
-    # 중복 방지
+   
     if not logger.handlers:
         os.makedirs("reports/logs", exist_ok=True)
 
@@ -18,4 +18,3 @@ def setup_logger(name):
         logger.addHandler(file_handler)
 
     return logger
-    
