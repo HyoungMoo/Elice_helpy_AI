@@ -10,13 +10,6 @@ def test_account_setting(logged_in_driver):
     # 계정 관리 페이지 이동
     account_setting.go_to_account_setting()
 
-    
-    # # 이름 변경 (실패)
-    account = AccountSetting(driver)
-    account.go_to_account_setting()
-    account.change_name("엘리스")
-
-    # # 프로필 이미지 변경 (실패)
-    # account_setting.profile_icon_set()
-
-   
+    # 이름 변경 
+    account_setting.change_name("엘리스")
+    print(driver.page_source)

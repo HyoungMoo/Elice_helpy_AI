@@ -7,7 +7,16 @@ from src.pages.auth.login_page import LoginPage
 def driver():
     options = Options()
     #options.add_argument("--headless")
-    options.add_experimental_option("detach", True) 
+    #options.add_argument("--window-size=1920,1080")
+    options.add_experimental_option("detach", True)
+
+    # 클립보드 권한 허용 (복사 버튼이 클립보드에 정상적으로 쓸 수 있도록)
+    options.add_experimental_option("prefs", {
+        "profile.content_settings.exceptions.clipboard": {
+            "*": {"setting": 1}
+        }
+    })
+
     driver = webdriver.Chrome(options=options)
     driver.implicitly_wait(5)
     yield driver
@@ -22,5 +31,4 @@ def logged_in_driver(driver):
 
 @pytest.fixture
 def fresh_driver(driver):
-    
     return driver
