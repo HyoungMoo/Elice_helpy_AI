@@ -1,0 +1,11 @@
+# Python 의존성 패키지 목록 (pip install -r requirements.txt)
+selenium==4.41.0
+pytest==9.0.2
+pytest-html==4.1.1
+pytest-metadata==3.1.1
+webdriver-manager==4.0.1
+python-dotenv==1.0.1
+pyperclip==1.11.0
+PyAutoGUI==0.9.54
+PyGetWindow==0.0.9
+python-pptx==1.0.2

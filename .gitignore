@@ -1,0 +1,29 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 가상환경
+venv/
+.env/
+.venv/
+
+# IDE/에디터 관련
+.vscode/
+.idea/
+
+# 로그 파일
+*.log
+
+# 테스트 관련
+.pytest_cache/
+
+# reports 내부 logs 및 screenshots 무시, .gitkeep는 추적
+reports/logs/*
+!reports/logs/.gitkeep
+
+reports/screenshots/*
+!reports/screenshots/.gitkeep
+
+# 민감정보
+credentials.json
