@@ -1,11 +1,9 @@
-import time
-
+from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
-
 from src.utils.logger import setup_logger
 
 class QuizPage:
@@ -103,6 +101,18 @@ class QuizPage:
 
         except:
             self.logger.info("팝업 없음 -> 정상 진행")
+            
+    def verify_quiz_generated(self):
+        try:
+            WebDriverWait(self.driver, 300).until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//p[contains(text(),'입력하신 내용 기반으로 퀴즈를 생성했습니다.')]")
+                )
+            )
+            self.logger.info("퀴즈 생성 성공 확인됨")
+        except TimeoutException:
+            self.logger.error("퀴즈 생성 실패: 5분 내 생성 완료 메시지 미확인")
+            raise AssertionError("퀴즈 생성 실패 - 생성 완료 메시지가 나타나지 않았습니다.")
     
     # 필수값(주제) 미입력 시 오류 메시지 확인 함수 
     def get_content_error_message(self):
@@ -121,23 +131,26 @@ class QuizPage:
     # 생성 중 입력란 비활성화 확인 함수    
     def check_inputs_disabled_during_creation(self):
         try:
-            #time.sleep(2)
+            # 중지 버튼이 나타날 때까지 대기 (생성 중 상태 기준)
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, "//button[.//*[@data-testid='stopIcon']]")
+                )
+            )
 
-            # 유형 - aria-disabled로 확인
+            # 비활성화 상태 확인
             option_type = self.driver.find_element(
                 By.ID, "mui-component-select-quiz_configs.0.option_type"
             )
             is_option_disabled = option_type.get_attribute("aria-disabled") == "true"
             self.logger.info(f"유형 선택 비활성화 여부: {is_option_disabled}")
 
-            # 난이도 - aria-disabled로 확인
             difficulty = self.driver.find_element(
                 By.ID, "mui-component-select-quiz_configs.0.difficulty"
             )
             is_difficulty_disabled = difficulty.get_attribute("aria-disabled") == "true"
             self.logger.info(f"난이도 선택 비활성화 여부: {is_difficulty_disabled}")
 
-            # 주제, 생성 버튼 - is_enabled()로 확인
             content = self.driver.find_element(By.NAME, "content")
             is_content_disabled = not content.is_enabled()
             self.logger.info(f"주제 입력 비활성화 여부: {is_content_disabled}")
@@ -174,7 +187,7 @@ class QuizPage:
         except Exception as e:
             self.logger.info(f"중지 버튼 없음 (이미 완료된 상태): {e}")
     
-    # 생성 도중 중지 완료 후 알림 메시지 함수       
+    # 생성 도중 중지 완료 후 알림 메시지 함수      
     def get_stop_alert_text(self):
         try:
             alert = self.wait.until(

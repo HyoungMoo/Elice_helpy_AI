@@ -29,6 +29,7 @@ def test_quiz_create_required_only(logged_in_driver):
     assert is_disabled, "생성 중 입력 요소가 비활성화되지 않음"
     logger.info("생성 중 입력 요소 비활성화 확인 완료")
     
+    quiz_page.verify_quiz_generated() ##########이거 잘 기억해두기
     logger.info("퀴즈 생성 성공 - 필수값 모두 입력")
 
 # 주제 미입력 시 생성 버튼 비활성화/에러 메시지 출력 확인
@@ -116,11 +117,8 @@ def test_quiz_create_by_option_type(logged_in_driver, option_type):
         difficulty="중",
         content="영단어",
     )
+    quiz_page.verify_quiz_generated()
     logger.info(f"퀴즈 생성 성공 - 유형: {option_type}")
-
-    is_disabled = quiz_page.check_inputs_disabled_during_creation()
-    assert is_disabled, "생성 중 입력 요소가 비활성화되지 않음"
-    logger.info("생성 중 입력 요소 비활성화 확인 완료")
 
 
 # 난이도별 테스트
@@ -143,11 +141,9 @@ def test_quiz_create_by_difficulty(logged_in_driver, difficulty):
         difficulty=difficulty,
         content="영단어",
     )
+    quiz_page.verify_quiz_generated()
     logger.info(f"퀴즈 생성 성공 - 난이도: {difficulty}")
-
-    is_disabled = quiz_page.check_inputs_disabled_during_creation()
-    assert is_disabled, "생성 중 입력 요소가 비활성화되지 않음"
-    logger.info("생성 중 입력 요소 비활성화 확인 완료")
+    
     
 # 다양한 입력값(특수문자, 긴 문자열) 테스트
 @pytest.mark.parametrize(
@@ -176,6 +172,6 @@ def test_quiz_create_special_and_long_input(logged_in_driver, case):
         difficulty="중",
         content=case["content"],
     )
-
-    is_disabled = quiz_page.check_inputs_disabled_during_creation()
-    assert is_disabled, f"{case['name']} 입력 시 생성 중 비활성화 실패"
+    
+    quiz_page.verify_quiz_generated()
+    logger.info(f"퀴즈 생성 성공 - {case['name']} 입력")
