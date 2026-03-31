@@ -1,5 +1,4 @@
 import pytest
-import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -7,88 +6,68 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 from src.pages.chat.chat_page import ChatPage, ANSWER_XPATH
 
-
-# ────────────────────────────────────────────────────────────────
-# CHAT-01-008: 질문 텍스트 수정 테스트
-# 내가 보낸 질문 위에 마우스를 올리면 나타나는 편집 버튼을 클릭해서
-# 질문을 수정하고 재전송했을 때 동작을 확인
-# ────────────────────────────────────────────────────────────────
 class TestQuestionEdit:
 
-    def test_edited_question_regenerates_answer_and_removes_old_answer(self, logged_in_driver):
-        """질문 수정 후 기존 답변이 사라지고 새 답변이 생성되는지 확인"""
+    def test_edited_question_regenerates_answer(self, logged_in_driver):
+        """[CHAT-01-008] 질문 수정 시 기존 답변 제거 및 새 답변 생성 검증"""
         driver = logged_in_driver
-        wait = WebDriverWait(driver, 30)
+        wait = WebDriverWait(driver, 20)
         actions = ActionChains(driver)
         chat_page = ChatPage(driver)
 
-        # ── 1. 초기 질문 전송 ─────────────────────────────────────────
+        # ── STEP 1. 초기 질문 전송 및 답변 확보 ───────────────────────
         print("\n[STEP 1] 초기 질문 전송")
         chat_page.send_question("사과 칼로리 알려줘")
-        print("  ✅ 초기 질문 전송 완료")
+        
+        # 답변이 나올 때까지 대기 후, 사라질 대상(old_answer)을 미리 특정합니다.
+        chat_page.wait_for_answer("사과")
+        old_answer_element = wait.until(EC.presence_of_element_located((By.XPATH, ANSWER_XPATH)))
+        print(f"  ✅ 초기 답변 확보 완료: {old_answer_element.text[:15]}...")
 
-        # ── 2. 답변 생성 완료 대기 ────────────────────────────────────
-        print("\n[STEP 2] 답변 생성 대기")
-        chat_page.wait_for_answer("사과 칼로리")
+        # ── STEP 2. 질문 카드 호버 및 편집 모드 진입 ───────────────────
+        print("[STEP 2] 질문 수정 버튼 클릭")
+        
+        # '사과'가 포함된 내 질문 카드를 찾아 마우스를 올립니다.
+        my_question_card = wait.until(EC.visibility_of_element_located(
+            (By.XPATH, "//div[contains(@class,'MuiPaper-root')][.//span[contains(text(),'사과')]]")
+        ))
+        actions.move_to_element(my_question_card).perform()
 
-        spans = driver.find_elements(By.XPATH, ANSWER_XPATH)
-        assert len(spans) > 0, "❌ 사과 칼로리 답변을 찾을 수 없습니다."
-        print(f"  ✅ 사과 칼로리 답변 확인 완료 (길이: {len(spans[-1].text.strip())}자)")
-
-        # ── 3. 질문 박스 호버 → 편집 버튼 클릭 ──────────────────────
-        print("\n[STEP 3] 질문 박스 호버 후 편집 버튼 클릭")
-
-        my_q_xpath = (
-            "//div[contains(@class,'MuiPaper-root')]"
-            "[.//span[@data-status='complete' and contains(text(),'사과')]]"
-        )
-        my_q_element = wait.until(EC.visibility_of_element_located((By.XPATH, my_q_xpath)))
-        actions.move_to_element(my_q_element).perform()
-        print("  📍 질문 박스 호버 중...")
-        time.sleep(1.5)
-
-        edit_btn = wait.until(
-            EC.presence_of_element_located((By.XPATH, "//button[.//*[@data-testid='penIcon']]"))
-        )
+        # 버튼이 '물리적으로 클릭 가능'할 때까지 기다린 후 JS로 확실하게 클릭
+        edit_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[.//*[@data-testid='penIcon']]")))
         driver.execute_script("arguments[0].click();", edit_btn)
-        print("  ✅ 편집 버튼 클릭 완료")
 
-        # ── 4. 텍스트 수정 후 보내기 클릭 ───────────────────────────
-        print("\n[STEP 4] 텍스트 수정 후 보내기 클릭")
-
+        # ── STEP 3. 질문 내용 수정 및 재전송 ─────────────────────────
+        print("[STEP 3] 질문 수정 및 보내기")
+        
         edit_input = wait.until(EC.element_to_be_clickable((By.XPATH, "//textarea")))
         edit_input.clear()
         edit_input.send_keys("포도 칼로리 알려줘")
-        print("  ✅ 텍스트 수정 완료: '사과 칼로리 알려줘' → '포도 칼로리 알려줘'")
-
-        save_btn = wait.until(EC.element_to_be_clickable((By.XPATH,
-            "//button[contains(@class,'MuiButton-containedPrimary') and contains(.,'보내기')]"
-        )))
+        
+        save_btn = wait.until(EC.element_to_be_clickable(
+            (By.XPATH, "//button[contains(@class,'MuiButton-containedPrimary') and contains(.,'보내기')]")
+        ))
         save_btn.click()
-        print("  ✅ 보내기 클릭 완료")
 
-        # ── 5. 사과 답변 소멸 확인 ───────────────────────────────────
-        print("\n[STEP 5] 사과 답변 소멸 확인")
-        time.sleep(2)
+        # ── STEP 4. 우아한 소멸 확인 (Staleness Check) ────────────────
+        print("[STEP 4] 기존 답변 소멸 검증")
+        
+        # 🔥 중요: '사과' 답변 요소가 화면에서 사라지거나 파괴될 때까지 대기 (가장 우아한 방식)
+        # 만약 수정 후에도 기존 답변이 남아있으면 여기서 타임아웃 에러가 발생합니다.
+        wait.until(EC.staleness_of(old_answer_element))
+        print("  ✅ 기존 답변이 정상적으로 제거되었습니다.")
 
-        try:
-            answer_texts = [s.text.strip() for s in driver.find_elements(By.XPATH, ANSWER_XPATH)]
-            assert not any("사과" in t for t in answer_texts), \
-                "❌ 질문 수정 후 기존 사과 칼로리 답변이 소멸되지 않았습니다."
-        except AssertionError:
-            raise
-        except Exception:
-            pass
-        print("  ✅ 기존 사과 칼로리 답변 소멸 확인 완료")
-
-        # ── 6. 포도 칼로리 새 답변 생성 확인 ─────────────────────────
-        print("\n[STEP 6] 포도 칼로리 새 답변 생성 확인")
-        chat_page.wait_for_answer("포도 칼로리")
-
-        new_spans = driver.find_elements(By.XPATH, ANSWER_XPATH)
-        assert len(new_spans) > 0, "❌ 포도 칼로리 새 답변이 생성되지 않았습니다."
-        assert any("포도" in s.text.strip() for s in new_spans), \
-            "❌ 새 답변에 포도 관련 내용이 없습니다."
-        print(f"  ✅ 포도 칼로리 새 답변 생성 확인 완료 (길이: {len(new_spans[-1].text.strip())}자)")
-
-        print("\n🎉 질문 텍스트 수정 테스트 통과!")
+        # ── STEP 5. 새 답변 생성 확인 ───────────────────────────────
+        print("[STEP 5] 새 답변 생성 검증")
+        
+        # 포도 관련 답변이 올 때까지 대기
+        chat_page.wait_for_answer("포도")
+        
+        new_answers = driver.find_elements(By.XPATH, ANSWER_XPATH)
+        latest_answer_text = new_answers[-1].text
+        
+        assert "포도" in latest_answer_text, f"❌ 새 답변에 '포도' 내용이 없습니다: {latest_answer_text[:20]}"
+        assert "사과" not in latest_answer_text, "❌ 새 답변에 이전 데이터(사과)가 섞여있습니다."
+        
+        print(f"  ✅ 새 답변 검증 완료: {latest_answer_text[:20]}...")
+        print("\n🎉 질문 수정 테스트 성공!")
