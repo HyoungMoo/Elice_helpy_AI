@@ -49,10 +49,10 @@ class TestQuestionEdit:
         ))
         save_btn.click()
 
-        # ── STEP 4. 우아한 소멸 확인 (Staleness Check) ────────────────
+        # ── STEP 4.  소멸 확인 (Staleness Check) ────────────────
         print("[STEP 4] 기존 답변 소멸 검증")
         
-        # 🔥 중요: '사과' 답변 요소가 화면에서 사라지거나 파괴될 때까지 대기 (가장 우아한 방식)
+        # 🔥 중요: '사과' 답변 요소가 화면에서 사라지거나 파괴될 때까지 대기 
         # 만약 수정 후에도 기존 답변이 남아있으면 여기서 타임아웃 에러가 발생합니다.
         wait.until(EC.staleness_of(old_answer_element))
         print("  ✅ 기존 답변이 정상적으로 제거되었습니다.")
