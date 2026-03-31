@@ -32,6 +32,7 @@ class PptPage:
         instructions: str = "",
         slides_count: str = "",
         section_count: str = "",
+        simple_mode: bool = None
     ):
         self.wait.until(
             EC.visibility_of_element_located((By.NAME, "topic"))
@@ -62,11 +63,18 @@ class PptPage:
         section_input.send_keys(section_count)
 
         self.logger.info("PPT 입력 완료")
-        """
-        # 심층 모드 온/오프
-        toggle = self.driver.find_element(By.NAME, "simple_mode")
-        toggle.click()
-        """
+       
+        # 심층 모드 온/오프 (선택)
+        if simple_mode is not None: # true(심층)/false(심플)
+            toggle = self.driver.find_element(By.NAME, "simple_mode") # value 값이 true(심플모드) 착각 ㄴㄴ
+            is_simple = toggle.is_selected()  # checked 속성 유무 확인, 체크 되어있으면 True, 아니면 False
+
+            if is_simple != simple_mode:
+                toggle.click()
+                self.logger.info(f"심층 모드 토글 변경 → simple_mode: {simple_mode}")
+            else:
+                self.logger.info(f"심층 모드 이미 원하는 상태 → simple_mode: {simple_mode}")
+        
         # 생성 버튼
         btn = self.wait.until(
             EC.presence_of_element_located(
@@ -139,7 +147,8 @@ class PptPage:
             raise AssertionError("생성 실패 - '생성 결과 다운받기' 버튼이 나타나지 않았습니다.")
 
         raise AssertionError("다운로드 버튼 클릭 실패 - StaleElementReferenceException 3회 반복")
-
+    
+    # 생성 완료 메시지 확인 함수 
     def verify_ppt_generated(self):
         try:
             WebDriverWait(self.driver, 300).until(
@@ -166,9 +175,9 @@ class PptPage:
         
         if expected_count:
             assert slide_count == expected_count, f"슬라이드 수 불일치 (입력값: {expected_count}, 실제값: {slide_count})"
-        
         return slide_count
-        
+    
+   # 중지 알림 확인 함수     
     def get_stop_alert_text(self):
         try:
             alert = self.wait.until(
@@ -180,6 +189,7 @@ class PptPage:
             self.logger.info(f"알림 없음: {e}")
             return None
         
+    # 생성 중 버튼 비활성화 확인 함수   
     def check_inputs_disabled_during_creation(self):
         try:
             selectors = {
@@ -187,7 +197,7 @@ class PptPage:
                 "지시사항 입력": (By.NAME, "instructions"),
                 "슬라이드 수 입력": (By.NAME, "slides_count"),
                 "섹션 수 입력": (By.NAME, "section_count"),
-               #"심층조사 모드 토글": (By.NAME, "simple_mode"),
+                "심층조사 모드 토글": (By.NAME, "simple_mode"),
                 "다시 생성 버튼": (By.XPATH, "//button[@type='submit' and @form='tool-factory-create_pptx']"),
             }
 
@@ -204,7 +214,8 @@ class PptPage:
         except Exception as e:
             self.logger.info(f"요소 확인 실패: {e}")
             return False
-    
+        
+    # 생성 버튼 비활성화 함수 
     def check_submit_button_disabled(self):
         btn = self.driver.find_element(
             By.XPATH, "//button[@type='submit' and @form='tool-factory-create_pptx']"
@@ -225,3 +236,6 @@ class PptPage:
             self.logger.info(f"에러 메시지 없음: {e}")
             return None
         
+    def get_network_error_message(self):
+        # TODO: 버그 수정 후 실제 에러 메시지 요소 구현
+        return None

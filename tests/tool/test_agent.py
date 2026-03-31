@@ -1,5 +1,4 @@
 from pathlib import Path
-
 import pytest
 from src.pages.tool.tool_page import ToolPage
 from src.pages.tool.agent_page import AgentPage
@@ -182,7 +181,7 @@ def test_agent_edit(logged_in_driver, created_agent):
     assert agent_page.is_agent_in_list("수정된 에이전트"), "수정된 에이전트가 목록에 없음"
     logger.info("수정 후 목록 반영 확인 완료")
     
-# 에이전트 삭제 테스트    
+# 에이전트 삭제 테스트
 def test_agent_delete(logged_in_driver, created_agent):
     logger.info("에이전트 삭제 테스트 시작")
     driver = logged_in_driver
@@ -198,3 +197,86 @@ def test_agent_delete(logged_in_driver, created_agent):
     assert agent_page.is_agent_deleted(), "에이전트 삭제 실패"
     assert agent_page.is_agent_in_list(created_agent, should_exist=False), "삭제된 에이전트가 목록에 남아있음"
     logger.info("에이전트 삭제 성공")
+
+# 나만 보기 설정 확인 테스트   
+def test_agent_private_visibility(logged_in_driver):
+    logger.info("에이전트 나만 보기 테스트 시작")
+    driver = logged_in_driver
+
+    tool_page = ToolPage(driver)
+    agent_page = AgentPage(driver)
+    logout_page = LogoutPage(driver)
+    login_page = LoginPage(driver)
+
+    # user_2로 에이전트 생성 (나만 보기)
+    tool_page.go_to_agent_page()
+    agent_page.go_to_builder()
+    tool_page.remove_tooltip()
+
+    name = f"비공개 에이전트 {datetime.now().strftime('%H%M%S')}"
+    agent_page.create_agent(
+        name=name,
+        system_prompt="존댓말 사용",
+        visibility="private"
+    )
+    assert agent_page.is_agent_created(), "에이전트 생성 실패"
+    logger.info("에이전트 생성 완료")
+
+    # user_2 목록에서 확인
+    tool_page.go_to_agent_page()
+    agent_page.search_agent(name)
+    assert agent_page.is_agent_in_list(name), "user_2 목록에서 에이전트 미확인"
+    logger.info("user_2 목록 확인 완료")
+
+    # 로그아웃 후 user_1으로 로그인
+    logout_page.logout()
+    logout_page.sign_different_account()
+    login_page.login("user_1")
+    logger.info("user_1 로그인 완료")
+
+    # user_1 목록에서 확인 - 없어야 함
+    tool_page.go_to_agent_page()
+    agent_page.search_agent(name)
+    assert agent_page.is_agent_in_list(name, should_exist=False), "user_1에게 비공개 에이전트가 노출됨"
+    logger.info("나만 보기 확인 완료 - user_1에게 미노출")
+    
+def test_agent_organization_visibility(logged_in_driver):
+    logger.info("에이전트 기관 내 공유 테스트 시작")
+    driver = logged_in_driver
+    
+    tool_page = ToolPage(driver)
+    agent_page = AgentPage(driver)
+    login_page = LoginPage(driver)
+    logout_page = LogoutPage(driver)
+    
+    tool_page.go_to_agent_page()
+    agent_page.go_to_builder()
+    tool_page.remove_tooltip()
+    
+    name = f"공개 에이전트 {datetime.now().strftime('%H%M%S')}"
+    agent_page.create_agent(
+        name=name,
+        system_prompt="존댓말 사용",
+        visibility="organization" # 기관 내 공개
+    )
+    assert agent_page.is_agent_created(), "에이전트 생성 실패"
+    logger.info("에이전트 생성 완료")
+    
+    # user_2 목록에서 확인
+    tool_page.go_to_agent_page()
+    agent_page.search_agent(name)
+    assert agent_page.is_agent_in_list(name), "user_2 목록에서 에이전트 미확인"
+    logger.info("user_2 목록 확인 완료")
+    
+    
+    # 로그아웃 후 user_1으로 로그인
+    logout_page.logout()
+    logout_page.sign_different_account()
+    login_page.login("user_1")
+    logger.info("user_1 로그인 완료")
+    
+    # user_1 목록에서 확인 - 있어야함
+    tool_page.go_to_agent_page()
+    agent_page.search_agent(name)
+    assert agent_page.is_agent_in_list(name), "user_1 목록에서 에이전트 미확인"
+    logger.info("기관 내 공유 확인 완료 - user_1에게 노출")
