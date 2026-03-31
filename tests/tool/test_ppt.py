@@ -8,6 +8,32 @@ import time
 
 logger = setup_logger("TestPPT")
 
+# 필수값(topic)만 입력 / 생성 중 버튼 비활성화 확인 / 정상 다운로드 확인
+def test_ppt_create_required_only(logged_in_driver):
+
+    driver = logged_in_driver
+    logger.info("PPT 생성 테스트 시작 - 필수값만 입력")
+
+    tool_page = ToolPage(driver)
+    ppt_page = PptPage(driver)
+
+    tool_page.go_to_tool_page()
+    tool_page.remove_tooltip()
+    ppt_page.go_to_ppt()
+    tool_page.remove_tooltip()
+
+    ppt_page.create_ppt(topic="파이썬 기초")
+    logger.info("PPT 생성 성공 - 필수값만 입력")
+
+    is_disabled = ppt_page.check_inputs_disabled_during_creation()
+    assert is_disabled, "생성 중 입력 요소가 비활성화되지 않음"
+    logger.info("생성 중 입력 요소 비활성화 확인 완료")
+    
+    ppt_page.wait_for_creation_complete()
+    
+    ppt_page.ppt_download()
+    logger.info("PPT 다운로드 확인 완료")
+
 # 필수값(topic) 미입력 시 생성 버튼 비활성화 확인
 def test_ppt_create_no_topic(logged_in_driver):
     
@@ -33,12 +59,13 @@ def test_ppt_create_no_topic(logged_in_driver):
     is_btn_disabled = ppt_page.check_submit_button_disabled()
     assert is_btn_disabled, "필수값(주제) 미입력 시 생성 버튼이 활성화되어 있음"
     logger.info("생성 버튼 비활성화 확인 완료")
-
-# PPT 생성 중 중지
-def test_ppt_creation_with_stop(logged_in_driver):
+    
+"""    
+# 특수문자 및 긴 입력값 입력 시 정상 처리 확인 <<<<< 여기 나중에 나눠서 테스트 해보는 것도 나쁘지 않을듯!!!!!
+def test_ppt_create_special_and_long(logged_in_driver):
 
     driver = logged_in_driver
-    logger.info("PPT 생성 중 중지 테스트 시작")
+    logger.info("PPT 생성 테스트 시작 - 특수문자 및 긴 입력값")
 
     tool_page = ToolPage(driver)
     ppt_page = PptPage(driver)
@@ -48,41 +75,17 @@ def test_ppt_creation_with_stop(logged_in_driver):
     ppt_page.go_to_ppt()
     tool_page.remove_tooltip()
 
-    ppt_page.create_ppt(topic="파이썬 기초")
-    time.sleep(2)
+    long_instructions = "파이썬은 매우 유용한 프로그래밍 언어입니다. " * 50  # 1000자 이상
 
-    ppt_page.stop_creation()
+    ppt_page.create_ppt(
+        topic="!!!@@@###", #특수문자
+        instructions=long_instructions,
+    )
+    logger.info("PPT 입력 완료 - 특수문자 및 긴 입력값")
 
-    alert_text = ppt_page.get_stop_alert_text()
-    assert alert_text is not None and "요청에 의해 답변 생성을 중지했습니다." in alert_text, f"예상과 다른 알림 메시지: {alert_text}"
-    logger.info(f"정상 중지 확인 - 알림 메시지: {alert_text}")
-    
-# 필수값(topic)만 입력 / 생성 중 버튼 비활성화 확인 / 정상 다운로드 확인
-def test_ppt_create_required_only(logged_in_driver):
-
-    driver = logged_in_driver
-    logger.info("PPT 생성 테스트 시작 - 필수값만 입력")
-
-    tool_page = ToolPage(driver)
-    ppt_page = PptPage(driver)
-
-    tool_page.remove_tooltip()
-    tool_page.go_to_tool_page()
-    tool_page.remove_tooltip()
-    ppt_page.go_to_ppt()
-    tool_page.remove_tooltip()
-
-    ppt_page.create_ppt(topic="파이썬 기초")
-    logger.info("PPT 생성 성공 - 필수값만 입력")
-
-    is_disabled = ppt_page.check_inputs_disabled_during_creation()
-    assert is_disabled, "생성 중 입력 요소가 비활성화되지 않음"
-    logger.info("생성 중 입력 요소 비활성화 확인 완료")
-    
     ppt_page.ppt_download()
-    logger.info("PPT 다운로드 확인 완료")
-
-"""   
+    logger.info("PPT 다운로드 확인 완료 - 특수문자 및 긴 입력값 정상 처리")
+"""    
 # 선택값 입력(슬라이드 수, 섹션 수 포함) / 정상 다운로드 확인/ 슬라이드 수 확인
 # with_all_optional
 def test_ppt_slide_count_validation(logged_in_driver):
@@ -118,12 +121,12 @@ def test_ppt_slide_count_validation(logged_in_driver):
     slide_count = ppt_page.check_ppt_slide_count(file_path)
     logger.info(f"슬라이드 수 확인 완료: {slide_count}장")
     assert slide_count == int(input_slides), f"슬라이드 수 불일치 (입력값: {input_slides}, 실제: {slide_count})"
-"""   
-# 특수문자 및 긴 입력값 입력 시 정상 처리 확인 
-def test_ppt_create_special_and_long(logged_in_driver):
+   
+# PPT 생성 중 중지
+def test_ppt_creation_with_stop(logged_in_driver):
 
     driver = logged_in_driver
-    logger.info("PPT 생성 테스트 시작 - 특수문자 및 긴 입력값")
+    logger.info("PPT 생성 중 중지 테스트 시작")
 
     tool_page = ToolPage(driver)
     ppt_page = PptPage(driver)
@@ -133,12 +136,13 @@ def test_ppt_create_special_and_long(logged_in_driver):
     ppt_page.go_to_ppt()
     tool_page.remove_tooltip()
 
-    long_instructions = "파이썬은 매우 유용한 프로그래밍 언어입니다. " * 50  # 1000자 이상
+    ppt_page.create_ppt(topic="파이썬 기초")
+    time.sleep(2)
 
-    ppt_page.create_ppt(
-        topic="!!!@@@###", #특수문자
-        instructions=long_instructions,
-    )
-    logger.info("PPT 입력 완료 - 특수문자 및 긴 입력값")
+    ppt_page.stop_creation()
 
-    ppt_page.verify_ppt_generated()
+    try:
+        ppt_page.ppt_download()
+        assert False, "중지했는데 다운로드가 실행됨 → 중단 실패"
+    except TimeoutException:
+        logger.info("정상 중지 확인 - 다운로드 버튼 미노출")

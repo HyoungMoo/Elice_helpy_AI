@@ -6,9 +6,8 @@ from src.pages.auth.login_page import LoginPage
 @pytest.fixture
 def driver():
     options = Options()
-    #options.add_argument("--headless")
-    #options.add_argument("--window-size=1920,1080")
-    #options.add_argument('--start-maximized')
+    # options.add_argument("--headless")
+    # options.add_argument("--window-size=1920,1080")
     options.add_experimental_option("detach", True)
 
     # 클립보드 권한 허용 (복사 버튼이 클립보드에 정상적으로 쓸 수 있도록)
@@ -27,9 +26,11 @@ def driver():
 def logged_in_driver(driver):
     login_page = LoginPage(driver)
     login_page.go_to_login_page()
-    login_page.login("user_2")
+    login_page.login("user_1")
     return driver
+
 
 @pytest.fixture
 def fresh_driver(driver):
     return driver
+

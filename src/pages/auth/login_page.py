@@ -47,6 +47,7 @@ class LoginPage:
     # 자동 로그인
     def login(self, user_key="user_3"):
         user = self.credentials[user_key]
+        self.driver.current_password = user["password"]
         self.driver.find_element(By.NAME, "loginId").send_keys(user["email"])
         self.driver.find_element(By.NAME, "password").send_keys(user["password"])
         self.driver.find_element(By.XPATH, "//button[text()='Login']").click()
