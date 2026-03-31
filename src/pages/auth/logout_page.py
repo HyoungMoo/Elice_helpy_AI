@@ -58,7 +58,7 @@ class LogoutPage:
         try:
             # 다른 계정으로 로그인 버튼 클릭
             different_account_button = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//a[text()='다른 계정으로 로그인']"))
+                EC.element_to_be_clickable((By.XPATH, "//a[text()='Sign in with a different account']"))
             )
             different_account_button.click()
 
@@ -68,6 +68,7 @@ class LogoutPage:
 
         except NoSuchElementException:
             print("다른 계정으로 로그인 요소가 존재하지 않습니다.")
+    
     
     # 다중탭 로그아웃 동기화 테스트
     def test_logout_sync(self):

@@ -114,14 +114,13 @@ class PptPage:
             self.logger.info(f"중지 버튼 없음 (이미 완료된 상태): {e}")
 
     # 다운로드 함수
-    def ppt_download(self, timeout: int = 120):
-        download_btn = WebDriverWait(self.driver, timeout).until(
+    def ppt_download(self):
+        download_btn = WebDriverWait(self.driver, 30).until(
             EC.element_to_be_clickable(
                 (By.XPATH, "//a[contains(text(),'생성 결과 다운받기')]")
             )
         )
         href = download_btn.get_attribute("href")
-       # self.logger.info(f"다운로드 URL: {href}")
         
         # URL에서 파일명만 추출
         filename = Path(urlparse(href).path).name
@@ -202,3 +201,23 @@ class PptPage:
         except Exception as e:
             self.logger.info(f"에러 메시지 없음: {e}")
             return None
+        
+    def wait_for_creation_complete(self):
+        # 중단 버튼 나타날 때까지 대기
+        try:
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, "//button[.//*[@data-testid='stopIcon']]")
+                )
+            )
+            self.logger.info("중단 버튼 감지 완료")
+        except:
+            self.logger.info("중단 버튼 미감지 → 이미 완료 상태일 수 있음")
+
+        # 중단 버튼 사라질 때까지 대기
+        WebDriverWait(self.driver, 180).until(
+            EC.invisibility_of_element_located(
+                (By.XPATH, "//button[.//*[@data-testid='stopIcon']]")
+            )
+        )
+        self.logger.info("생성 완료 확인")

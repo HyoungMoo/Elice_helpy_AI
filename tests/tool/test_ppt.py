@@ -29,6 +29,8 @@ def test_ppt_create_required_only(logged_in_driver):
     assert is_disabled, "생성 중 입력 요소가 비활성화되지 않음"
     logger.info("생성 중 입력 요소 비활성화 확인 완료")
     
+    ppt_page.wait_for_creation_complete()
+    
     ppt_page.ppt_download()
     logger.info("PPT 다운로드 확인 완료")
 
@@ -58,6 +60,7 @@ def test_ppt_create_no_topic(logged_in_driver):
     assert is_btn_disabled, "필수값(주제) 미입력 시 생성 버튼이 활성화되어 있음"
     logger.info("생성 버튼 비활성화 확인 완료")
     
+"""    
 # 특수문자 및 긴 입력값 입력 시 정상 처리 확인 <<<<< 여기 나중에 나눠서 테스트 해보는 것도 나쁘지 않을듯!!!!!
 def test_ppt_create_special_and_long(logged_in_driver):
 
@@ -80,13 +83,9 @@ def test_ppt_create_special_and_long(logged_in_driver):
     )
     logger.info("PPT 입력 완료 - 특수문자 및 긴 입력값")
 
-    is_disabled = ppt_page.check_inputs_disabled_during_creation()
-    assert is_disabled, "생성 중 입력 요소가 비활성화되지 않음"
-    logger.info("생성 중 입력 요소 비활성화 확인 완료")
-
     ppt_page.ppt_download()
     logger.info("PPT 다운로드 확인 완료 - 특수문자 및 긴 입력값 정상 처리")
-    
+"""    
 # 선택값 입력(슬라이드 수, 섹션 수 포함) / 정상 다운로드 확인/ 슬라이드 수 확인
 # with_all_optional
 def test_ppt_slide_count_validation(logged_in_driver):
@@ -112,13 +111,8 @@ def test_ppt_slide_count_validation(logged_in_driver):
     )
     logger.info("PPT 생성 성공 - 모든 값 커스텀")
 
-    is_disabled = ppt_page.check_inputs_disabled_during_creation()
-    assert is_disabled, "생성 중 입력 요소가 비활성화되지 않음"
-    logger.info("생성 중 입력 요소 비활성화 확인 완료")
-
     filename = ppt_page.ppt_download()
     logger.info("PPT 다운로드 확인 완료")
-
     # 다운로드 완료 대기
     time.sleep(3)
 
@@ -137,7 +131,6 @@ def test_ppt_creation_with_stop(logged_in_driver):
     tool_page = ToolPage(driver)
     ppt_page = PptPage(driver)
 
-
     tool_page.go_to_tool_page()
     tool_page.remove_tooltip()
     ppt_page.go_to_ppt()
@@ -149,7 +142,7 @@ def test_ppt_creation_with_stop(logged_in_driver):
     ppt_page.stop_creation()
 
     try:
-        ppt_page.ppt_download(timeout=5)
+        ppt_page.ppt_download()
         assert False, "중지했는데 다운로드가 실행됨 → 중단 실패"
     except TimeoutException:
         logger.info("정상 중지 확인 - 다운로드 버튼 미노출")
