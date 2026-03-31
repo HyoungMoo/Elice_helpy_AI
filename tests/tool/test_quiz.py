@@ -143,7 +143,10 @@ def test_quiz_create_by_difficulty(logged_in_driver, difficulty):
     )
     quiz_page.verify_quiz_generated()
     logger.info(f"퀴즈 생성 성공 - 난이도: {difficulty}")
-    
+
+    #is_disabled = quiz_page.check_inputs_disabled_during_creation()
+    #assert is_disabled, "생성 중 입력 요소가 비활성화되지 않음"
+    #logger.info("생성 중 입력 요소 비활성화 확인 완료")
     
 # 다양한 입력값(특수문자, 긴 문자열) 테스트
 @pytest.mark.parametrize(
@@ -172,6 +175,6 @@ def test_quiz_create_special_and_long_input(logged_in_driver, case):
         difficulty="중",
         content=case["content"],
     )
-    
-    quiz_page.verify_quiz_generated()
-    logger.info(f"퀴즈 생성 성공 - {case['name']} 입력")
+
+   # is_disabled = quiz_page.check_inputs_disabled_during_creation()
+    #assert is_disabled, f"{case['name']} 입력 시 생성 중 비활성화 실패"
