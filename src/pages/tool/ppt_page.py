@@ -1,3 +1,6 @@
+import time
+
+from selenium.common import StaleElementReferenceException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -29,6 +32,7 @@ class PptPage:
         instructions: str = "",
         slides_count: str = "",
         section_count: str = "",
+        simple_mode: bool = None
     ):
         self.wait.until(
             EC.visibility_of_element_located((By.NAME, "topic"))
@@ -59,11 +63,18 @@ class PptPage:
         section_input.send_keys(section_count)
 
         self.logger.info("PPT 입력 완료")
-        """
-        # 심층 모드 온/오프
-        toggle = self.driver.find_element(By.NAME, "simple_mode")
-        toggle.click()
-        """
+       
+        # 심층 모드 온/오프 (선택)
+        if simple_mode is not None: # true(심층)/false(심플)
+            toggle = self.driver.find_element(By.NAME, "simple_mode") # value 값이 true(심플모드) 착각 ㄴㄴ
+            is_simple = toggle.is_selected()  # checked 속성 유무 확인, 체크 되어있으면 True, 아니면 False
+
+            if is_simple != simple_mode:
+                toggle.click()
+                self.logger.info(f"심층 모드 토글 변경 → simple_mode: {simple_mode}")
+            else:
+                self.logger.info(f"심층 모드 이미 원하는 상태 → simple_mode: {simple_mode}")
+        
         # 생성 버튼
         btn = self.wait.until(
             EC.presence_of_element_located(
@@ -115,20 +126,41 @@ class PptPage:
 
     # 다운로드 함수
     def ppt_download(self):
-        download_btn = WebDriverWait(self.driver, 30).until(
-            EC.element_to_be_clickable(
-                (By.XPATH, "//a[contains(text(),'생성 결과 다운받기')]")
-            )
-        )
-        href = download_btn.get_attribute("href")
-        
-        # URL에서 파일명만 추출
-        filename = Path(urlparse(href).path).name
-        self.logger.info(f"다운로드 파일명: {filename}")
-        
-        download_btn.click()
-        return filename
+        try:
+            for attempt in range(3):
+                try:
+                    download_btn = WebDriverWait(self.driver, 300).until(
+                        EC.element_to_be_clickable(
+                            (By.XPATH, "//a[contains(text(),'생성 결과 다운받기')]")
+                        )
+                    )
+                    href = download_btn.get_attribute("href")
+                    filename = Path(urlparse(href).path).name
+                    self.logger.info(f"다운로드 파일명: {filename}")
+                    download_btn.click()
+                    return filename
+                except StaleElementReferenceException:
+                    self.logger.warning(f"StaleElementReferenceException 발생, 재시도 {attempt + 1}/3")
+                    time.sleep(1)
+        except TimeoutException:
+            self.logger.error("생성 실패: 5분 내 '생성 결과 다운받기' 버튼 미확인")
+            raise AssertionError("생성 실패 - '생성 결과 다운받기' 버튼이 나타나지 않았습니다.")
+
+        raise AssertionError("다운로드 버튼 클릭 실패 - StaleElementReferenceException 3회 반복")
     
+    # 생성 완료 메시지 확인 함수 
+    def verify_ppt_generated(self):
+        try:
+            WebDriverWait(self.driver, 300).until(
+                EC.visibility_of_element_located(
+                    (By.XPATH, "//p[contains(text(),'입력하신 내용 기반으로 PPT를 생성했습니다.')]")
+                )
+            )
+            self.logger.info("PPT 생성 성공 확인됨")
+        except TimeoutException:
+            self.logger.error("PPT 생성 실패: 5분 내 생성 완료 메시지 미확인")
+            raise AssertionError("PPT 생성 실패 - 생성 완료 메시지가 나타나지 않았습니다.")
+        
     # 슬라이드 수 카운드 함수   
     def check_ppt_slide_count(self, file_path, expected_count=None):
 
@@ -143,9 +175,9 @@ class PptPage:
         
         if expected_count:
             assert slide_count == expected_count, f"슬라이드 수 불일치 (입력값: {expected_count}, 실제값: {slide_count})"
-        
         return slide_count
-        
+    
+   # 중지 알림 확인 함수     
     def get_stop_alert_text(self):
         try:
             alert = self.wait.until(
@@ -157,6 +189,7 @@ class PptPage:
             self.logger.info(f"알림 없음: {e}")
             return None
         
+    # 생성 중 버튼 비활성화 확인 함수   
     def check_inputs_disabled_during_creation(self):
         try:
             selectors = {
@@ -164,7 +197,7 @@ class PptPage:
                 "지시사항 입력": (By.NAME, "instructions"),
                 "슬라이드 수 입력": (By.NAME, "slides_count"),
                 "섹션 수 입력": (By.NAME, "section_count"),
-               #"심층조사 모드 토글": (By.NAME, "simple_mode"),
+                "심층조사 모드 토글": (By.NAME, "simple_mode"),
                 "다시 생성 버튼": (By.XPATH, "//button[@type='submit' and @form='tool-factory-create_pptx']"),
             }
 
@@ -181,7 +214,8 @@ class PptPage:
         except Exception as e:
             self.logger.info(f"요소 확인 실패: {e}")
             return False
-    
+        
+    # 생성 버튼 비활성화 함수 
     def check_submit_button_disabled(self):
         btn = self.driver.find_element(
             By.XPATH, "//button[@type='submit' and @form='tool-factory-create_pptx']"
@@ -202,22 +236,6 @@ class PptPage:
             self.logger.info(f"에러 메시지 없음: {e}")
             return None
         
-    def wait_for_creation_complete(self):
-        # 중단 버튼 나타날 때까지 대기
-        try:
-            WebDriverWait(self.driver, 10).until(
-                EC.presence_of_element_located(
-                    (By.XPATH, "//button[.//*[@data-testid='stopIcon']]")
-                )
-            )
-            self.logger.info("중단 버튼 감지 완료")
-        except:
-            self.logger.info("중단 버튼 미감지 → 이미 완료 상태일 수 있음")
-
-        # 중단 버튼 사라질 때까지 대기
-        WebDriverWait(self.driver, 180).until(
-            EC.invisibility_of_element_located(
-                (By.XPATH, "//button[.//*[@data-testid='stopIcon']]")
-            )
-        )
-        self.logger.info("생성 완료 확인")
+    def get_network_error_message(self):
+        # TODO: 버그 수정 후 실제 에러 메시지 요소 구현
+        return None
