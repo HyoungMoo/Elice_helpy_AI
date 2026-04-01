@@ -121,3 +121,39 @@ def test_quiz_create_special_and_long_input(quiz_ready, case):
     )
     quiz_page.verify_quiz_generated()
     logger.info(f"퀴즈 생성 성공 - {case['name']} 입력")
+    
+# 퀴즈 생성 중 네트워크 오류 발생 테스트
+@pytest.mark.xfail(reason="네트워크 오류 시 에러 메시지 미출력 버그 - 무한 로딩 발생")
+def test_quiz_network_timeout(quiz_ready, logged_in_driver):
+    quiz_page = quiz_ready
+    driver = logged_in_driver
+    logger.info("퀴즈 생성 테스트 시작 - 네트워크 지연")
+
+    driver.execute_cdp_cmd("Network.enable", {})
+    driver.execute_cdp_cmd("Network.emulateNetworkConditions", {
+        "offline": False,
+        "latency": 10000,
+        "downloadThroughput": 500,
+        "uploadThroughput": 500,
+    })
+    logger.info("네트워크 스로틀링 적용 완료")
+
+    try:
+        quiz_page.create_quiz(
+            option_type="객관식(단일 선택)",
+            difficulty="중",
+            content="영단어",
+        )
+
+        # 에러 메시지가 표시되어야 함 (현재는 무한 로딩으로 실패)
+        error_msg = quiz_page.get_network_error_message()
+        assert error_msg is not None, "네트워크 오류 시 에러 메시지가 표시되지 않음"
+
+    finally:
+        driver.execute_cdp_cmd("Network.emulateNetworkConditions", {
+            "offline": False,
+            "latency": 0,
+            "downloadThroughput": -1,
+            "uploadThroughput": -1,
+        })
+        logger.info("네트워크 스로틀링 해제 완료")

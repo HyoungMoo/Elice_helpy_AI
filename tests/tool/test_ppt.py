@@ -115,7 +115,8 @@ def test_ppt_create_special_and_long(ppt_ready):
     logger.info("PPT 입력 완료 - 특수문자 및 긴 입력값")
 
     ppt_page.verify_ppt_generated()
-    
+
+# PPT 생성 중 네트워크 오류 발생 테스트    
 @pytest.mark.xfail(reason="네트워크 오류 시 에러 메시지 미출력 버그 - 무한 로딩 발생")
 def test_ppt_network_timeout(ppt_ready, logged_in_driver):
     ppt_page = ppt_ready
