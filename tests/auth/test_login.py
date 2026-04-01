@@ -14,7 +14,7 @@ def test_login(fresh_driver):
     # 이메일 :  qa4team0103@elicer.com
     # 비밀번호 : qa4team0103!!
     assert login_page.test_login(
-        email = "qa4team0103@elicer.com",
+        email = "eunhajeong707@gmail.com",
         password= "qa4team0103!!",
     ), "이메일과 비밀번호를 찾을 수 없습니다"
 

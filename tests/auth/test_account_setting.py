@@ -16,7 +16,7 @@ def test_account_setting(logged_in_driver):
     # 프로필 이미지 변경
     account_setting.change_profile_image()
     account_setting.refresh() #새로고침
-    time.sleep(1)
+    time.sleep(3)
     
     # 프로필 이미지 삭제
     account_setting.delete_profile_image()
@@ -25,8 +25,7 @@ def test_account_setting(logged_in_driver):
     
     # 이름 변경
     account_setting.change_name("엘리스")
-
-    time.sleep(1)
+    time.sleep(3)
     # 비밀번호 변경 (현재비밀번호, 새비밀번호, 새비밀번호확인)
     # account_setting.change_password(logged_in_driver.current_password,"qa4team0202!!","qa4team0202!!")
     

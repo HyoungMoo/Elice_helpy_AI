@@ -2,8 +2,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
-
-
+from pathlib import Path
+from selenium.webdriver.support.ui import Select
 
 
 class AccountSetting:
@@ -48,25 +48,48 @@ class AccountSetting:
             )
         icon.click()
        
+    # # 프로필 이미지 변경
+    # def change_profile_image(self):
+    #     # 프로필 아이콘 클릭
+    #     self.click_profile_image_icon()
+    #     # '프로필 이미지 변경' 버튼 클릭
+    #     edit_btn = self.wait.until(
+    #             EC.element_to_be_clickable((
+    #                 By.XPATH,  "//li[.//p[text()='프로필 이미지 변경']]"
+    #             ))
+    #         )
+    #     edit_btn.click()
+    #     # 프로필 이미지 삽입
+    #     upload = self.wait.until(
+    #             EC.presence_of_element_located((
+    #                 By.XPATH, "//input[@type='file']"))
+    #         )
+    #     # 절대 경로로 이미지 삽입
+    #     upload.send_keys(r"C:\Users\user\eliceqa_first_project\src\resources\assets\frog.png")
     # 프로필 이미지 변경
     def change_profile_image(self):
         # 프로필 아이콘 클릭
         self.click_profile_image_icon()
+
         # '프로필 이미지 변경' 버튼 클릭
         edit_btn = self.wait.until(
-                EC.element_to_be_clickable((
-                    By.XPATH,  "//li[.//p[text()='프로필 이미지 변경']]"
-                ))
-            )
+            EC.element_to_be_clickable((
+                By.XPATH, "//li[.//p[text()='프로필 이미지 변경']]"
+            ))
+        )
         edit_btn.click()
-        # 프로필 이미지 삽입
-        upload = self.wait.until(
-                EC.presence_of_element_located((
-                    By.XPATH, "//input[@type='file']"))
-            )
-        # 절대 경로로 이미지 삽입
-        upload.send_keys(r"C:\Users\user\eliceqa_first_project\src\resources\assets\frog.png")
 
+        # 파일 업로드 input
+        upload = self.wait.until(
+            EC.presence_of_element_located((
+                By.XPATH, "//input[@type='file']"
+            ))
+        )
+
+        # 프로젝트 기준 이미지 경로
+        img_path = Path(__file__).resolve().parent.parent.parent / "resources" / "assets" / "frog.png"
+
+        upload.send_keys(str(img_path))
     # # 프로필 이미지 삭제
     def delete_profile_image(self):
         # 프로필 아이콘 클릭
@@ -155,7 +178,7 @@ class AccountSetting:
         )
         btn.click()
 
-    # 선호 언어 변경
+    # 선호 언어 변경 (한국어->영어->한국어)
     def change_language(self):
         # 토글 열기
         toggle = self.wait.until(
@@ -165,6 +188,16 @@ class AccountSetting:
         # 옵션 선택
         option = self.wait.until(
             EC.element_to_be_clickable((By.XPATH,"//li[@data-value='en-US']"))
+        )
+        option.click()
+        # 토글 열기
+        toggle = self.wait.until(
+            EC.element_to_be_clickable((By.ID,"mui-component-select-locale"))
+        )
+        toggle.click()
+        # 옵션 선택
+        option = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH,"//li[@data-value='ko-KR']"))
         )
         option.click()
 
@@ -193,3 +226,11 @@ class AccountSetting:
         
         # 탈퇴하기 버튼 클릭
         self.click_auth_delete_btn()
+    # 회원가입 페이지 한국어로 변경 
+    def change_language_to_korean(self):
+        dropdown = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, 'select[aria-label="Change Languages"]'))
+        )
+
+        select = Select(dropdown)
+        select.select_by_value("ko-KR")

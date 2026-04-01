@@ -21,7 +21,7 @@ def test_account_withdrawal(fresh_driver):
 
     # 1. 계정탈퇴용 테스트 계정 생성 - 회원가입 페이지 이동
     signup_page.go_to_signup_page()
-
+    account_setting.change_language_to_korean()
     # 2. 계정탈퇴용 테스트 계정 생성 - '이메일로 가입하기' 버튼 클릭
     assert signup_page.click_signup_with_email(), "'이메일로 가입하기' 버튼을 찾을 수 없습니다."
     # 3. 계정탈퇴용 테스트 계정 생성 -  회원가입 폼 화면 표시 확인

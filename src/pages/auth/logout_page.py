@@ -13,7 +13,6 @@ class LogoutPage:
     def __init__(self, driver:WebDriver):
         self.driver = driver
         self.wait = WebDriverWait(driver,10)
-    
 
     def logout(self):
         try:
@@ -25,7 +24,7 @@ class LogoutPage:
 
             # 로그아웃 버튼 클릭
             logout_button = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//p[text()='로그아웃']"))
+                EC.element_to_be_clickable((By.XPATH, "//div[contains(@class,'MuiListItemButton-root') and .//p[text()='로그아웃']]"))
             )
             logout_button.click()
 
