@@ -76,7 +76,7 @@ def test_ppt_create_deep_mode(ppt_ready):
     logger.info("PPT 생성 성공 - 심층 모드")
 
 # 선택값 입력(슬라이드 수, 섹션 수 포함) / 정상 다운로드 확인 / 슬라이드 수 확인
-@pytest.mark.skip(reason="슬라이드 수가 입력값과 일치하지 않아 검증 불안정")
+@pytest.mark.xfail(reason="슬라이드 수가 입력값과 일치하지 않는 버그")
 def test_ppt_slide_count_validation(ppt_ready):
     ppt_page = ppt_ready
     logger.info("PPT 생성 테스트 시작 - 모든 값 커스텀")
