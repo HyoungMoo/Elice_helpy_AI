@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest tests/chat/test_file_upload_returns_answer.py --collect-only)"
+    ]
+  }
+}

@@ -15,7 +15,9 @@ def created_agent(logged_in_driver):
     tool_page = ToolPage(logged_in_driver)
     agent_page = AgentPage(logged_in_driver)
 
+    tool_page.remove_tooltip()
     tool_page.go_to_agent_page()
+    tool_page.remove_tooltip()
     agent_page.go_to_builder()
     tool_page.remove_tooltip()
     agent_page.create_agent(

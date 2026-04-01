@@ -3,8 +3,6 @@ import pytest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-
 
 # ────────────────────────────────────────────────────────────────
 # 공통 XPath 상수
@@ -23,12 +21,63 @@ class ChatPage:
         self.driver = driver
         self.wait = WebDriverWait(driver, 30)
 
+    def hover_element(self, element):
+        """JS 이벤트로 요소에 호버 효과 적용.
+        headless Chrome에서 ActionChains.move_to_element()은 CSS :hover를
+        트리거하지 않으므로 mouseover/mouseenter 이벤트를 직접 디스패치한다."""
+        self.driver.execute_script("""
+            arguments[0].dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
+            arguments[0].dispatchEvent(new MouseEvent('mouseenter', {bubbles: true}));
+        """, element)
+
+    def _find_file_input(self):
+        """shadow DOM 포함 전체 DOM에서 input[type='file'] 탐색.
+        일반 XPath는 shadow DOM 내부를 탐색하지 못하므로 JS로 직접 순회한다."""
+        return self.driver.execute_script("""
+            function findInput(root) {
+                for (const el of root.querySelectorAll('input')) {
+                    if (el.type === 'file') return el;
+                }
+                for (const el of root.querySelectorAll('*')) {
+                    if (el.shadowRoot) {
+                        const found = findInput(el.shadowRoot);
+                        if (found) return found;
+                    }
+                }
+                return null;
+            }
+            return findInput(document);
+        """)
+
     def send_question(self, question):
         """질문 입력 및 전송"""
         input_box = self.wait.until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, "textarea[name='input']"))
         )
         input_box.send_keys(question)
+        send_btn = self.wait.until(
+            EC.element_to_be_clickable((By.XPATH, SEND_BTN_XPATH))
+        )
+        send_btn.click()
+
+    def send_large_text(self, text):
+        """대용량 텍스트를 JS로 textarea에 직접 주입 후 전송
+        send_keys()는 글자 단위로 입력해 느리므로, React의 합성 이벤트를
+        직접 발생시켜 상태를 업데이트한다. pyperclip 없이 headless에서도 동작."""
+        input_box = self.wait.until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "textarea[name='input']"))
+        )
+        # React controlled component는 네이티브 value setter + input 이벤트로 값을 주입해야 함
+        self.driver.execute_script(
+            """
+            var setter = Object.getOwnPropertyDescriptor(
+                window.HTMLTextAreaElement.prototype, 'value'
+            ).set;
+            setter.call(arguments[0], arguments[1]);
+            arguments[0].dispatchEvent(new Event('input', { bubbles: true }));
+            """,
+            input_box, text
+        )
         send_btn = self.wait.until(
             EC.element_to_be_clickable((By.XPATH, SEND_BTN_XPATH))
         )
@@ -163,35 +212,75 @@ class ChatPage:
             return False
 
     def upload_file(self, file_path):
-        """파일 업로드 — plusIcon 클릭 후 파일 경로 전달"""
-        plus_btn = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//button[.//*[@data-testid='plusIcon']]"))
-        )
-        plus_btn.click()
-        time.sleep(1)
+        """파일 업로드.
 
-        upload_menu = self.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH, "//*[contains(@class,'MuiListItemText-primary') and contains(text(),'파일 업로드')]")
+        - 텍스트 파일(.txt): 내용을 읽어 JS로 textarea에 직접 주입 후 전송.
+          OS 네이티브 파일 다이얼로그를 완전히 우회하며 headless/CI에서도 동작.
+        - 바이너리 파일(jpg/pdf/xlsx 등): + 버튼 → 파일 업로드 메뉴 클릭 후
+          shadow DOM 포함 전체 DOM에서 file input을 탐색해 send_keys()로 경로 전달.
+          (일반 XPath는 shadow DOM 내부를 탐색하지 못하므로 JS 탐색을 사용)
+        """
+        import mimetypes
+        mime_type, _ = mimetypes.guess_type(file_path)
+        is_text = (mime_type or "").startswith("text/")
+
+        if is_text:
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            message = f"아래 내용을 핵심 위주로 요약해주고, 불렛포인트(-)를 사용해줘:\n\n{content}"
+            self.send_large_text(message)
+            return
+
+        # 바이너리 파일: 두 전략을 순서대로 시도
+        #
+        # 앱에 따라 두 가지 구현이 존재:
+        #   A) 클릭 후 input[type='file']이 DOM에 생성됨 → send_keys로 직접 경로 전달
+        #   B) 클릭이 OS 네이티브 파일 다이얼로그를 트리거함 → CDP로 가로채기
+        #
+        # CDP를 먼저 활성화해 두면 B 케이스를 놓치지 않고,
+        # 실제로 DOM input이 있으면 A 전략이 우선 적용된다.
+        import os
+        abs_path = os.path.abspath(file_path)
+
+        # CDP 가로채기를 미리 활성화 (OS 다이얼로그가 열리는 경우 대비)
+        self.driver.execute_cdp_cmd(
+            "Page.setInterceptFileChooserDialog", {"enabled": True}
+        )
+        try:
+            plus_btn = self.wait.until(
+                EC.element_to_be_clickable((By.XPATH, "//button[.//*[@data-testid='plusIcon']]"))
             )
-        )
-        upload_menu.click()
-        time.sleep(1)
+            plus_btn.click()
+            time.sleep(1)
 
-        # JS 로 input 요소 보이게 한 후 파일 경로 전달
-        # OS 파일 탐색기를 Selenium 으로 제어할 수 없으므로 이 방식 사용
-        file_input = self.wait.until(
-            EC.presence_of_element_located((By.XPATH, "//input[@type='file']"))
-        )
-        self.driver.execute_script(
-            "arguments[0].style.display = 'block'; arguments[0].style.visibility = 'visible';",
-            file_input
-        )
-        file_input.send_keys(file_path)
-        time.sleep(2)
+            upload_menu = self.wait.until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, "//*[contains(@class,'MuiListItemText-primary') and contains(text(),'파일 업로드')]")
+                )
+            )
+            upload_menu.click()
+            time.sleep(1)
 
-        self.driver.find_element(By.TAG_NAME, "body").send_keys(Keys.ESCAPE)
-        time.sleep(1)
+            # 전략 A: DOM(shadow DOM 포함)에서 file input 탐색 후 send_keys
+            file_input = self._find_file_input()
+            if file_input:
+                self.driver.execute_script(
+                    "arguments[0].style.display='block'; arguments[0].style.visibility='visible';",
+                    file_input
+                )
+                file_input.send_keys(abs_path)
+            else:
+                # 전략 B: CDP가 가로챈 OS 다이얼로그에 파일 경로 전달
+                self.driver.execute_cdp_cmd(
+                    "Page.handleFileChooser",
+                    {"action": "accept", "files": [abs_path]}
+                )
+            time.sleep(2)
+        finally:
+            # 다른 테스트에 영향 없도록 가로채기 비활성화
+            self.driver.execute_cdp_cmd(
+                "Page.setInterceptFileChooserDialog", {"enabled": False}
+            )
 
     def get_upload_error_text(self, timeout=5):
         """파일 업로드 에러 메시지 반환"""

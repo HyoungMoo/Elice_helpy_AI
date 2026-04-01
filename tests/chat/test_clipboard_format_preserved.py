@@ -6,7 +6,6 @@ import pygetwindow as gw
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
 from src.pages.chat.chat_page import ChatPage, ANSWER_XPATH
@@ -78,7 +77,6 @@ class TestClipboardFormat:
         """질문/답변 복사 버튼 클릭 후 메모장 붙여넣기 시 서식이 유지되는지 확인"""
         driver = logged_in_driver
         wait = WebDriverWait(driver, 30)
-        actions = ActionChains(driver)
         chat_page = ChatPage(driver)
 
         # ── 1. 줄바꿈 포함 질문 전송 ──────────────────────────────────
@@ -115,7 +113,7 @@ class TestClipboardFormat:
         my_q_element = wait.until(EC.visibility_of_element_located((By.XPATH, my_q_xpath)))
 
         # 질문 박스 위로 마우스 이동 — 복사 버튼이 나타나도록 호버
-        actions.move_to_element(my_q_element).perform()
+        chat_page.hover_element(my_q_element)
         print("  📍 질문 박스 호버 중...")
         time.sleep(1.5)
 
@@ -149,7 +147,7 @@ class TestClipboardFormat:
         assert len(answer_containers) > 0, "❌ [케이스 2] 답변 요소를 찾을 수 없습니다."
 
         last_answer = answer_containers[-1]
-        actions.move_to_element(last_answer).perform()
+        chat_page.hover_element(last_answer)
         print("  📍 답변 영역 호버 중...")
         time.sleep(1.5)
 
