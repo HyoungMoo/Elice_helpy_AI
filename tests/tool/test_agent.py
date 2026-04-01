@@ -15,7 +15,9 @@ def created_agent(logged_in_driver):
     tool_page = ToolPage(logged_in_driver)
     agent_page = AgentPage(logged_in_driver)
 
+    tool_page.remove_tooltip()
     tool_page.go_to_agent_page()
+    tool_page.remove_tooltip()
     agent_page.go_to_builder()
     tool_page.remove_tooltip()
     agent_page.create_agent(
@@ -36,7 +38,7 @@ def test_agent_create_missing_name(logged_in_driver):
 
     tool_page = ToolPage(driver)
     agent_page = AgentPage(driver)
-
+    
     tool_page.go_to_agent_page()
     agent_page.go_to_builder()
     tool_page.remove_tooltip()
@@ -123,6 +125,7 @@ def test_agent_conversation_starters_max(logged_in_driver):
     agent_page = AgentPage(driver)
 
     tool_page.go_to_agent_page()
+    tool_page.remove_tooltip()
     agent_page.go_to_builder()
     tool_page.remove_tooltip()
 
@@ -239,7 +242,8 @@ def test_agent_private_visibility(logged_in_driver):
     agent_page.search_agent(name)
     assert agent_page.is_agent_in_list(name, should_exist=False), "user_1에게 비공개 에이전트가 노출됨"
     logger.info("나만 보기 확인 완료 - user_1에게 미노출")
-    
+
+# 기관 내 공유 설정 확인 테스트     
 def test_agent_organization_visibility(logged_in_driver):
     logger.info("에이전트 기관 내 공유 테스트 시작")
     driver = logged_in_driver
@@ -267,7 +271,6 @@ def test_agent_organization_visibility(logged_in_driver):
     agent_page.search_agent(name)
     assert agent_page.is_agent_in_list(name), "user_2 목록에서 에이전트 미확인"
     logger.info("user_2 목록 확인 완료")
-    
     
     # 로그아웃 후 user_1으로 로그인
     logout_page.logout()

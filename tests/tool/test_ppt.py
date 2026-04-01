@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from src.pages.tool.tool_page import ToolPage
 from src.pages.tool.ppt_page import PptPage

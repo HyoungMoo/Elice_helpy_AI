@@ -120,10 +120,10 @@ class AgentPage:
             if visibility != "private":
                 radio = self.wait.until(
                     EC.element_to_be_clickable(
-                        (By.XPATH, f"//input[@type='radio' and @value='{visibility}']")
+                        (By.XPATH, f"//input[@type='radio' and @value='{visibility}']/ancestor::label")
                     )
                 )
-                self.driver.execute_script("arguments[0].click();", radio)
+                radio.click()
                 self.logger.info(f"공개 설정 선택 완료: {visibility}")
 
             # 저장 버튼 클릭
