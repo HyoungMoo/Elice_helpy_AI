@@ -92,7 +92,7 @@ def test_ppt_slide_count_validation(ppt_ready):
     logger.info("PPT 다운로드 확인 완료")
     time.sleep(3)
 
-    file_path = Path.home() / "Downloads" / filename
+    file_path = Path.home() / "reports/downloads" / filename
     slide_count = ppt_page.check_ppt_slide_count(file_path)
     logger.info(f"슬라이드 수 확인 완료: {slide_count}장")
     assert slide_count == int(input_slides), \

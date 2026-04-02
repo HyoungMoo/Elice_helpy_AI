@@ -76,7 +76,6 @@ class QuizPage:
         if not btn.is_enabled(): # 버튼 비활성화 확인 -> 클릭 생략 /// 이거 밑에 따로 함수 있음 나중에 정리
             self.logger.info("생성 버튼 비활성화")
             return
-
         btn.click()
 
         # 🔥 다시 생성 팝업 발생 시 재시도
