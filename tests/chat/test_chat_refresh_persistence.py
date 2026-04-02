@@ -4,7 +4,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from src.pages.chat.chat_page import ChatPage, STOP_BTN_XPATH
+from src.pages.chat.chat_page import ChatPage
+from src.utils.chat_locators import ChatLocators
+
+STOP_BTN_XPATH = ChatLocators.STOP_BTN[1]
 
 
 # ────────────────────────────────────────────────────────────────
@@ -27,7 +30,7 @@ class TestRefresh:
         # ── 2. 답변 생성 시작 확인 후 5초 대기 ──────────────────────
         wait.until(EC.presence_of_element_located((By.XPATH, STOP_BTN_XPATH)))
         print("  ⏳ 답변 생성 중 확인 — 5초 후 새로고침 수행")
-        time.sleep(5)
+        time.sleep(10)
 
         # ── 3. 답변 생성 도중 새로고침 ───────────────────────────────
         driver.refresh()

@@ -198,3 +198,7 @@ class QuizPage:
         except Exception as e:
             self.logger.info(f"알림 없음: {e}")
             return None
+    # 생성 도중 네트워크 오류 발생 시 알림 메시지 함수    
+    def get_network_error_message(self):
+        # TODO: 버그 수정 후 실제 에러 메시지 요소 구현
+        return None

@@ -28,7 +28,7 @@ class AgentPage:
         )
         element.click()
         self.logger.info("내 에이전트 페이지 이동 완료")
-        
+    # 에이전트 생성    
     def create_agent(
         self, name: str, 
         system_prompt: str, # 규칙(필수)
@@ -138,7 +138,7 @@ class AgentPage:
         except Exception as e:
             self.logger.error(f"에이전트 생성 실패: {e}")
             raise 
-    
+    # 생성 완료 메시지 확인 함수 
     def is_agent_created(self):
         try:
             alert = self.wait.until(
@@ -149,6 +149,7 @@ class AgentPage:
             self.logger.info(f"생성 완료 알림 없음: {e}")
             return False
         
+    # 업데이트 완료 메시지 확인 함수     
     def is_agent_updated(self):
         try:
             alert = self.wait.until(
@@ -158,7 +159,8 @@ class AgentPage:
         except Exception as e:
             self.logger.info(f"업데이트 완료 알림 없음: {e}")
             return False
-        
+    
+    # 필수값(이름) 미입력 에러 메시지 확인 함수     
     def get_name_error_message(self):
         try:
             error = self.wait.until(
@@ -171,7 +173,8 @@ class AgentPage:
         except Exception as e:
             self.logger.info(f"에러 메시지 없음: {e}")
             return None
-
+        
+    # 필수값(규칙) 미입력 에러 메시지 확인 함수 
     def get_rule_error_message(self):
         try:
             error = self.wait.until(
@@ -184,7 +187,7 @@ class AgentPage:
         except Exception as e:
             self.logger.info(f"에러 메시지 없음: {e}")
             return None
-        
+    # 파일 업로드 함수   
     def upload_file(self, file_path: str):
         file_input = self.driver.find_element(By.CSS_SELECTOR, "input.css-1bgri6b")
         self.driver.execute_script("arguments[0].style.display = 'block';", file_input)
@@ -196,7 +199,8 @@ class AgentPage:
             )
         )
         self.logger.info(f"파일 업로드 성공: {file_path}")
-        
+    
+    # 수정 함수     
     def go_to_edit(self, name: str):
         edit_btn = self.wait.until(
             EC.element_to_be_clickable(
@@ -206,6 +210,7 @@ class AgentPage:
         edit_btn.click()
         self.logger.info(f"에이전트 수정 페이지 이동: {name}")
     
+    # 삭제 함수 
     def delete_agent(self, name: str):
         delete_btn = self.wait.until(
             EC.element_to_be_clickable(
@@ -224,6 +229,7 @@ class AgentPage:
         confirm_btn.click()
         self.logger.info("삭제 확인 클릭 완료")
         
+    # 삭제 메시지 확인 함수     
     def is_agent_deleted(self):
         try:
             alert = self.wait.until(
@@ -233,7 +239,8 @@ class AgentPage:
         except Exception as e:
             self.logger.info(f"삭제 완료 알림 없음: {e}")
             return False
-        
+    
+    # 에이전트 목록 유무 확인 함수       
     def is_agent_in_list(self, name: str, should_exist: bool = True):
         try:
             if should_exist:
@@ -253,7 +260,8 @@ class AgentPage:
         except Exception as e:
             self.logger.info(f"에이전트 목록 확인 실패: {e}")
             return False
-        
+    
+    # 에이전트 검색 함수     
     def search_agent(self, name: str):
         search_input = self.wait.until(
             EC.visibility_of_element_located(
