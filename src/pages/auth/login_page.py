@@ -5,7 +5,6 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
 from src.utils.auth_locators import CommonAuthLocators, LoginLocators
 
 
