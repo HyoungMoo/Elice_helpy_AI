@@ -57,6 +57,19 @@ def test_account_setting_change_language(logged_in_driver):
     time.sleep(2)
     account_setting.change_language_to_korean_setting()
     
+# 프로모션 알림 켜고 끄기 테스트
+def test_account_setting_open_to_close_promotion(logged_in_driver):
+    driver = logged_in_driver
+    account_setting = AccountSetting(driver)
+    # 계정 관리 페이지 이동
+    account_setting.go_to_account_setting()
+    time.sleep(1)
+    # 프로모션 알림 받기
+    account_setting.open_toggle_promotion()
+    time.sleep(2)
+    # 프로모션 알림 끄기
+    account_setting.close_toggle_promotion()
+    
 # 비밀번호 변경 테스트 (conftest.py 내 logged_in_driver current_password 정의 설정 필요)
 # def test_account_setting_change_password(logged_in_driver):
 #     driver = logged_in_driver

@@ -216,3 +216,21 @@ class AccountSetting:
         )
         select = Select(dropdown)
         select.select_by_value("ko-KR")
+    
+    # 프로모션 알림 받기
+    def open_toggle_promotion(self):
+        toggle = self.wait.until(
+            EC.presence_of_element_located(AccountSettingLocators.PROMOTION_TOGGLE)
+        )
+        toggle.click()
+        # dropdown 닫힘 대기
+        self.wait.until(
+            EC.invisibility_of_element_located(("css selector", ".MuiBackdrop-root"))
+        )
+    
+    # 프로모션 알림 해지
+    def close_toggle_promotion(self):
+        toggle = self.wait.until(
+            EC.presence_of_element_located(AccountSettingLocators.PROMOTION_TOGGLE)
+        )
+        toggle.click()

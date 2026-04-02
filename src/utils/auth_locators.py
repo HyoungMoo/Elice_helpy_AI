@@ -58,6 +58,9 @@ class AccountSettingLocators:
     WITHDRAWAL_BTN = (By.XPATH, "//button[text()='탈퇴하기']")
     WITHDRAWAL_EMAIL_INPUT = (By.NAME, "email")
 
+    # 프로모션
+    PROMOTION_TOGGLE = (By.XPATH, "//input[@name='marketing']")
+
     # 동적 locator
     @staticmethod
     def language_option(value: str):
