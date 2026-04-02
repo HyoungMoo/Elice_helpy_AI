@@ -21,7 +21,6 @@ def test_account_setting_change_profile_image(logged_in_driver):
     time.sleep(1)
     # 프로필 이미지 변경
     account_setting.change_profile_image()
-    account_setting.refresh() #새로고침
     time.sleep(3)
 # 이미지 삭제 테스트
 def test_account_setting_delete_profile_image(logged_in_driver):
@@ -32,7 +31,6 @@ def test_account_setting_delete_profile_image(logged_in_driver):
     time.sleep(1)
     # 프로필 이미지 삭제
     account_setting.delete_profile_image()
-    account_setting.refresh() #새로고침
     time.sleep(1)
 # 이름 변경 테스트
 def test_account_setting_change_name(logged_in_driver):
@@ -56,7 +54,7 @@ def test_account_setting_change_language(logged_in_driver):
     account_setting.change_language_to_english_setting()
     time.sleep(2)
     account_setting.change_language_to_korean_setting()
-    
+
 # 프로모션 알림 켜고 끄기 테스트
 def test_account_setting_open_to_close_promotion(logged_in_driver):
     driver = logged_in_driver
