@@ -11,9 +11,7 @@ def quiz_ready(logged_in_driver):
     quiz_page = QuizPage(logged_in_driver)
 
     tool_page.go_to_tool_page()
-    tool_page.remove_tooltip()
     quiz_page.go_to_quiz()
-    tool_page.remove_tooltip()
 
     return quiz_page
 

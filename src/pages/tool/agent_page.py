@@ -62,9 +62,7 @@ class AgentPage:
                 category.click()
 
                 option = self.wait.until(
-                    EC.element_to_be_clickable(
-                        EC.element_to_be_clickable(AgentLocators.category_option(purpose))
-                    )
+                    EC.element_to_be_clickable(AgentLocators.category_option(purpose))
                 )
                 option.click()
                 self.logger.info(f"카테고리 선택 완료: {purpose}")

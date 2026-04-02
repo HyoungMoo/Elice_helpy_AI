@@ -12,11 +12,8 @@ def ppt_ready(logged_in_driver):
     tool_page = ToolPage(logged_in_driver)
     ppt_page = PptPage(logged_in_driver)
 
-    tool_page.remove_tooltip()
     tool_page.go_to_tool_page()
-    tool_page.remove_tooltip()
     ppt_page.go_to_ppt()
-    tool_page.remove_tooltip()
 
     return ppt_page
 
