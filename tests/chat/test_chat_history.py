@@ -5,9 +5,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 
-from src.pages.chat.chat_page import ChatPage, ANSWER_XPATH, SIDEBAR_ITEMS_XPATH
+from src.pages.chat.chat_page import ChatPage
+from src.utils.chat_locators import ChatLocators
 
 # ── 공통 설정 및 XPath ──────────────────────────────────────────
+ANSWER_XPATH        = ChatLocators.ANSWER[1]
+SIDEBAR_ITEMS_XPATH = ChatLocators.SIDEBAR_ITEMS[1]
 CHAT_TITLE_XPATH    = ".//p[contains(@class,'css-ff35j5')]"
 SEARCH_RESULT_XPATH = "//ul[contains(@class,'css-1baokfq')]//a[contains(@href,'/ai-helpy-chat/chats/')]"
 SEARCH_TITLE_XPATH  = ".//span[contains(@class,'MuiListItemText-primary')]"

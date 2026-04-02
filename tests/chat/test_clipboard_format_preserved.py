@@ -8,7 +8,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 
-from src.pages.chat.chat_page import ChatPage, ANSWER_XPATH
+from src.pages.chat.chat_page import ChatPage
+from src.utils.chat_locators import ChatLocators
+
+ANSWER_XPATH = ChatLocators.ANSWER[1]
 
 
 # ────────────────────────────────────────────────────────────────

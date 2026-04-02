@@ -5,7 +5,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 
-from src.pages.chat.chat_page import ChatPage, STOP_BTN_XPATH
+from src.pages.chat.chat_page import ChatPage
+from src.utils.chat_locators import ChatLocators
+
+STOP_BTN_XPATH = ChatLocators.STOP_BTN[1]
 
 
 # ────────────────────────────────────────────────────────────────
