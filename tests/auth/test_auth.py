@@ -20,8 +20,8 @@ def test_signup_email_button_opens_form(fresh_driver):
     # 비밀번호 qa4team0106!!
     # 이름 정은하회원가입테스트
     assert signup_page.fill_signup_form(
-        email="qa4team1234@elicer.com",
-        password="qa4team1234!!",
+        email="qa4team543210@elicer.com",
+        password="qa4team543210!!",
         name="정은하회원가입테스트"
     ), "회원가입 폼 입력 실패"
     # 5. 전체 동의 체크

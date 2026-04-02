@@ -4,7 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from pathlib import Path
 from src.utils.auth_locators import CommonAuthLocators, AccountSettingLocators
-
+import time
 
 class AccountSetting:
 
@@ -14,7 +14,7 @@ class AccountSetting:
 
     # 새로고침 메서드
     def refresh(self):
-        self.driver.refresh()
+        self.refresh()
 
     # 메인 → 계정관리 페이지 이동
     def go_to_account_setting(self):
@@ -152,8 +152,9 @@ class AccountSetting:
         )
         btn.click()
 
-    # 선호 언어 변경 (한국어->영어->한국어)
-    def change_language(self):
+    # 선호 언어 변경 (한국어->영어)
+    def change_language_to_english_setting(self):
+
         # 토글 열기
         toggle = self.wait.until(
             EC.element_to_be_clickable(AccountSettingLocators.LANGUAGE_SELECT)
@@ -165,7 +166,12 @@ class AccountSetting:
             EC.element_to_be_clickable(AccountSettingLocators.language_option("en-US"))
         )
         option.click()
-
+        # dropdown 닫힘 대기
+        self.wait.until(
+            EC.invisibility_of_element_located(("css selector", ".MuiBackdrop-root"))
+        )
+    # 선호 언어 변경 (영어->한국어)
+    def change_language_to_korean_setting(self):
         # 토글 열기
         toggle = self.wait.until(
             EC.element_to_be_clickable(AccountSettingLocators.LANGUAGE_SELECT)
@@ -203,7 +209,7 @@ class AccountSetting:
         # 탈퇴하기 버튼 클릭
         self.click_auth_delete_btn()
 
-    # 회원가입 페이지 한국어로 변경
+    # 회원가입 페이지 한국어로 변경 (푸터바)
     def change_language_to_korean(self):
         dropdown = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable(AccountSettingLocators.LANGUAGE_DROPDOWN)
