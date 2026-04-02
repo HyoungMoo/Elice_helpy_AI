@@ -3,6 +3,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from src.utils.logger import setup_logger
+from src.utils.tool_locators import ToolPageLocators, CommonLocators
 
 class ToolPage:
     
@@ -14,7 +15,7 @@ class ToolPage:
     def go_to_tool_page(self):
         self.logger.info("도구 페이지 이동 시도")
         element = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH,"//a[@href='/ai-helpy-chat/tools']"))
+            EC.element_to_be_clickable(ToolPageLocators.GO_TO_TOOL)
         )
         
         element.click()
@@ -23,7 +24,7 @@ class ToolPage:
     def go_to_agent_page(self):
         self.logger.info("에이전트 탐색 페이지 이동 시도")
         element = self.wait.until(
-            EC.element_to_be_clickable((By.XPATH,"//a[@href='/ai-helpy-chat/agents']"))
+            EC.element_to_be_clickable(ToolPageLocators.GO_TO_AGENT)
         )
         
         element.click()
@@ -32,7 +33,7 @@ class ToolPage:
     def remove_tooltip(self):
         try:
             WebDriverWait(self.driver, 2).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "[role='tooltip']"))
+                EC.presence_of_element_located(CommonLocators.TOOLTIP)
             )
         except:
             pass

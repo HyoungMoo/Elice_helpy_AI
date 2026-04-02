@@ -123,7 +123,7 @@ def test_quiz_create_special_and_long_input(quiz_ready, case):
     logger.info(f"퀴즈 생성 성공 - {case['name']} 입력")
     
 # 퀴즈 생성 중 네트워크 오류 발생 테스트
-@pytest.mark.xfail(reason="네트워크 오류 시 에러 메시지 미출력 버그 - 무한 로딩 발생")
+@pytest.mark.xfail(reason="네트워크 오류 시 에러 메시지 미출력 버그")
 def test_quiz_network_timeout(quiz_ready, logged_in_driver):
     quiz_page = quiz_ready
     driver = logged_in_driver
@@ -145,7 +145,7 @@ def test_quiz_network_timeout(quiz_ready, logged_in_driver):
             content="영단어",
         )
 
-        # 에러 메시지가 표시되어야 함 (현재는 무한 로딩으로 실패)
+        # 에러 메시지가 표시되어야 함
         error_msg = quiz_page.get_network_error_message()
         assert error_msg is not None, "네트워크 오류 시 에러 메시지가 표시되지 않음"
 
