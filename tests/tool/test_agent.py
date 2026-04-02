@@ -15,11 +15,8 @@ def created_agent(logged_in_driver):
     tool_page = ToolPage(logged_in_driver)
     agent_page = AgentPage(logged_in_driver)
 
-    tool_page.remove_tooltip()
     tool_page.go_to_agent_page()
-    tool_page.remove_tooltip()
     agent_page.go_to_builder()
-    tool_page.remove_tooltip()
     agent_page.create_agent(
         name=name,
         system_prompt="존댓말 사용",
@@ -41,7 +38,6 @@ def test_agent_create_missing_name(logged_in_driver):
     
     tool_page.go_to_agent_page()
     agent_page.go_to_builder()
-    tool_page.remove_tooltip()
     agent_page.create_agent(name="", system_prompt="존댓말 사용")
     
     error = agent_page.get_name_error_message()
@@ -59,7 +55,6 @@ def test_agent_create_missing_system_prompt(logged_in_driver):
 
     tool_page.go_to_agent_page()
     agent_page.go_to_builder()
-    tool_page.remove_tooltip()
     agent_page.create_agent(name="테스트 에이전트", system_prompt="")
     
     error = agent_page.get_rule_error_message()
@@ -77,7 +72,6 @@ def test_agent_create_with_all_optional(logged_in_driver):
 
     tool_page.go_to_agent_page()
     agent_page.go_to_builder()
-    tool_page.remove_tooltip()
 
     agent_page.create_agent(
         name="자동화 테스트 에이전트",
@@ -105,7 +99,6 @@ def test_agent_create_with_file(logged_in_driver):
 
     tool_page.go_to_agent_page()
     agent_page.go_to_builder()
-    tool_page.remove_tooltip()
 
     agent_page.upload_file(file_path) # 파일 업로드
     agent_page.create_agent(
@@ -125,9 +118,7 @@ def test_agent_conversation_starters_max(logged_in_driver):
     agent_page = AgentPage(driver)
 
     tool_page.go_to_agent_page()
-    tool_page.remove_tooltip()
     agent_page.go_to_builder()
-    tool_page.remove_tooltip()
 
     agent_page.create_agent(
         name="시작 대화 테스트 에이전트",
@@ -148,7 +139,6 @@ def test_agent_create_required_only(logged_in_driver):
 
     tool_page.go_to_agent_page()
     agent_page.go_to_builder()
-    tool_page.remove_tooltip()
 
     agent_page.create_agent(
         name="자동화 테스트 에이전트",
@@ -214,7 +204,6 @@ def test_agent_private_visibility(logged_in_driver):
     # user_2로 에이전트 생성 (나만 보기)
     tool_page.go_to_agent_page()
     agent_page.go_to_builder()
-    tool_page.remove_tooltip()
 
     name = f"비공개 에이전트 {datetime.now().strftime('%H%M%S')}"
     agent_page.create_agent(
@@ -255,7 +244,6 @@ def test_agent_organization_visibility(logged_in_driver):
     
     tool_page.go_to_agent_page()
     agent_page.go_to_builder()
-    tool_page.remove_tooltip()
     
     name = f"공개 에이전트 {datetime.now().strftime('%H%M%S')}"
     agent_page.create_agent(

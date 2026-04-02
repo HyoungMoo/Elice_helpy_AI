@@ -27,3 +27,6 @@ reports/screenshots/*
 
 # 민감정보
 credentials.json
+
+# 공통 설정
+conftest.py
