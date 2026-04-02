@@ -42,9 +42,9 @@ def test_account_setting_change_name(logged_in_driver):
     # 이름 변경
     account_setting.change_name("엘리스")
     time.sleep(3)
-# 선호 언어 변경 테스트
+# 선호 언어 변경 테스트 (한국어 -> 영어 -> 한국어)
 # pytest tests/auth/test_account_setting.py::test_account_setting_change_language
-def test_account_setting_change_language(logged_in_driver):
+def test_account_setting_change_language_to_english(logged_in_driver):
     driver = logged_in_driver
     account_setting = AccountSetting(driver)
     # 계정 관리 페이지 이동
@@ -54,6 +54,49 @@ def test_account_setting_change_language(logged_in_driver):
     account_setting.change_language_to_english_setting()
     time.sleep(2)
     account_setting.change_language_to_korean_setting()
+
+# 선호 언어 변경 테스트2 (한국어 -> 영어 -> 일본어 -> 타이 -> 한국어)
+def test_account_setting_change_language_to_global(logged_in_driver):
+    driver = logged_in_driver
+    account_setting = AccountSetting(driver)
+    # 계정 관리 페이지 이동
+    account_setting.go_to_account_setting()
+    time.sleep(1)
+    # 선호 언어 변경
+    account_setting.change_language_to_english_setting()
+    time.sleep(2)
+    account_setting.change_language_to_japanese_setting()
+    time.sleep(2)
+    account_setting.change_language_to_thai_setting()
+    time.sleep(2)
+    account_setting.change_language_to_korean_setting()
+    time.sleep(2)
+
+# 선호 언어 변경 테스트3 (한국어 -> 일본어 -> 한국어)
+def test_account_setting_change_language_to_japanese(logged_in_driver):
+    driver = logged_in_driver
+    account_setting = AccountSetting(driver)
+    # 계정 관리 페이지 이동
+    account_setting.go_to_account_setting()
+    time.sleep(1)
+    # 선호 언어 변경
+    account_setting.change_language_to_japanese_setting()
+    time.sleep(2)
+    account_setting.change_language_to_korean_setting()
+    time.sleep(2)
+
+# 선호 언어 변경 테스트4 (한국어 -> 타이 -> 한국어)
+def test_account_setting_change_language_to_thai(logged_in_driver):
+    driver = logged_in_driver
+    account_setting = AccountSetting(driver)
+    # 계정 관리 페이지 이동
+    account_setting.go_to_account_setting()
+    time.sleep(1)
+    # 선호 언어 변경
+    account_setting.change_language_to_thai_setting()
+    time.sleep(2)
+    account_setting.change_language_to_korean_setting()
+    time.sleep(2)
 
 # 프로모션 알림 켜고 끄기 테스트
 def test_account_setting_open_to_close_promotion(logged_in_driver):

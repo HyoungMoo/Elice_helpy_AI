@@ -152,7 +152,7 @@ class AccountSetting:
         )
         btn.click()
 
-    # 선호 언어 변경 (한국어->영어)
+    # 선호 언어 변경 (영어)
     def change_language_to_english_setting(self):
 
         # 토글 열기
@@ -170,7 +170,7 @@ class AccountSetting:
         self.wait.until(
             EC.invisibility_of_element_located(("css selector", ".MuiBackdrop-root"))
         )
-    # 선호 언어 변경 (영어->한국어)
+    # 선호 언어 변경 (한국어)
     def change_language_to_korean_setting(self):
         # 토글 열기
         toggle = self.wait.until(
@@ -183,7 +183,44 @@ class AccountSetting:
             EC.element_to_be_clickable(AccountSettingLocators.language_option("ko-KR"))
         )
         option.click()
+        # dropdown 닫힘 대기
+        self.wait.until(
+            EC.invisibility_of_element_located(("css selector", ".MuiBackdrop-root"))
+        )
+    # 선호 언어 변경 (일본어)
+    def change_language_to_japanese_setting(self):
+        # 토글 열기
+        toggle = self.wait.until(
+            EC.element_to_be_clickable(AccountSettingLocators.LANGUAGE_SELECT)
+        )
+        toggle.click()
 
+        # 옵션 선택
+        option = self.wait.until(
+            EC.element_to_be_clickable(AccountSettingLocators.language_option("ja-JP"))
+        )
+        option.click()
+        # dropdown 닫힘 대기
+        self.wait.until(
+            EC.invisibility_of_element_located(("css selector", ".MuiBackdrop-root"))
+        )
+    # 선호 언어 변경 (태국어)
+    def change_language_to_thai_setting(self):
+        # 토글 열기
+        toggle = self.wait.until(
+            EC.element_to_be_clickable(AccountSettingLocators.LANGUAGE_SELECT)
+        )
+        toggle.click()
+
+        # 옵션 선택
+        option = self.wait.until(
+            EC.element_to_be_clickable(AccountSettingLocators.language_option("th-TH"))
+        )
+        option.click()
+        # dropdown 닫힘 대기
+        self.wait.until(
+            EC.invisibility_of_element_located(("css selector", ".MuiBackdrop-root"))
+        )
     # 계정 탈퇴 '탈퇴하기' 버튼 클릭
     def click_auth_delete_btn(self):
         btn = self.wait.until(
