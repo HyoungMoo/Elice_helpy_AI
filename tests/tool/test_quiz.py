@@ -15,6 +15,24 @@ def quiz_ready(logged_in_driver):
 
     return quiz_page
 
+# 퀴즈 생성 중 중지
+def test_quiz_creation_with_stop(quiz_ready):
+    quiz_page = quiz_ready
+    logger.info("quiz 생성 중 중지 테스트 시작")
+
+    quiz_page.create_quiz(
+        option_type="객관식(단일 선택)",
+        difficulty="중",
+        content="영단어",
+    )
+
+    quiz_page.stop_creation()
+
+    alert_text = quiz_page.get_stop_alert_text()
+    assert alert_text is not None, "중단 알림이 표시되지 않음"
+    assert "중지" in alert_text
+    logger.info("퀴즈 생성 중 중지 테스트 완료")
+    
 # 필수값 모두 입력 (정상 생성)
 def test_quiz_create_required_only(quiz_ready):
     quiz_page = quiz_ready
@@ -51,24 +69,6 @@ def test_quiz_create_no_content(quiz_ready):
     is_btn_disabled = quiz_page.check_submit_button_disabled()
     assert is_btn_disabled, "주제 미입력 시 생성 버튼이 활성화되어 있음"
     logger.info("생성 버튼 비활성화 확인 완료")
-
-# 퀴즈 생성 중 중지
-def test_quiz_creation_with_stop(quiz_ready):
-    quiz_page = quiz_ready
-    logger.info("quiz 생성 중 중지 테스트 시작")
-
-    quiz_page.create_quiz(
-        option_type="객관식(단일 선택)",
-        difficulty="중",
-        content="영단어",
-    )
-
-    quiz_page.stop_creation()
-
-    alert_text = quiz_page.get_stop_alert_text()
-    assert alert_text is not None, "중단 알림이 표시되지 않음"
-    assert "중지" in alert_text
-    logger.info("퀴즈 생성 중 중지 테스트 완료")
 
 # 유형별 정상 생성 확인
 @pytest.mark.parametrize("option_type", [
