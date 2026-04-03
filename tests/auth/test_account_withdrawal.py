@@ -31,8 +31,8 @@ def test_account_withdrawal(fresh_driver):
     # 테스트 비밀번호 qa4team9999!!
     # 이름 계정탈퇴용 테스트
     assert signup_page.fill_signup_form(
-        email="qa4team1111@elicer.com",
-        password="qa4team111!!",
+        email="qa4team2000@elicer.com",
+        password="qa4team222!!",
         name="계정탈퇴용 테스트"
     ), "회원가입 폼 입력 실패"
     # 5. 계정탈퇴용 테스트 계정 생성 - 전체 동의 체크
@@ -45,4 +45,4 @@ def test_account_withdrawal(fresh_driver):
     time.sleep(1)
 
     #8. 계정 탈퇴 '탈퇴하기' 버튼 클릭
-    account_setting.account_withdrawal("qa4team1111@elicer.com")
+    account_setting.account_withdrawal("qa4team2000@elicer.com")
