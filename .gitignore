@@ -25,5 +25,10 @@ reports/logs/*
 reports/screenshots/*
 !reports/screenshots/.gitkeep
 
+reports/downloads/*
+!reports/downloads/.gitkeep
 # 민감정보
 credentials.json
+
+# 공통 설정
+conftest.py
