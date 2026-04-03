@@ -12,6 +12,12 @@ def test_account_setting_go_to_account_setting(logged_in_driver):
     # 계정 관리 페이지 이동
     account_setting.go_to_account_setting()
     time.sleep(1)
+# 결제 내역 페이지 이동 테스트
+def test_account_setting_go_to_billing_history(logged_in_driver):
+    driver = logged_in_driver
+    account_setting = AccountSetting(driver)
+    account_setting.go_to_billing_history()
+    time.sleep(1)
 # 이미지 변경 테스트
 def test_account_setting_change_profile_image(logged_in_driver):
     driver = logged_in_driver

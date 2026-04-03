@@ -41,6 +41,32 @@ class AccountSetting:
         self.wait.until(
             EC.visibility_of_element_located(AccountSettingLocators.TABLE_LOADED)
         )
+    # 메인 -> 결제 내역 페이지 이동
+    def go_to_billing_history(self):
+        try:
+            # 프로필 아이콘 클릭
+            profile_icon = self.wait.until(
+                EC.element_to_be_clickable(CommonAuthLocators.PROFILE_ICON)
+            )
+            profile_icon.click()
+
+            # 드롭다운 메뉴 로드 대기 후 결제 내역 클릭
+            account_setting = self.wait.until(
+                EC.visibility_of_element_located(AccountSettingLocators.BILLING_HISTORY)
+            )
+            self.driver.execute_script("arguments[0].click();", account_setting)  # JS 클릭으로 변경
+
+            # 새 탭 전환 (대기 시간 여유 있게)
+            self.wait.until(EC.number_of_windows_to_be(2))
+            self.driver.switch_to.window(self.driver.window_handles[-1])
+
+            # URL 부분 문자열로 확인 (유연하게)
+            self.wait.until(EC.url_contains("payments.elice.io"))
+
+        except TimeoutException as e:
+            print(f"[TimeoutException] 현재 URL: {self.driver.current_url}")
+            print(f"[TimeoutException] 열린 탭 수: {len(self.driver.window_handles)}")
+            raise e
 
     # 프로필 아이콘 클릭
     def click_profile_image_icon(self):
@@ -271,3 +297,5 @@ class AccountSetting:
             EC.presence_of_element_located(AccountSettingLocators.PROMOTION_TOGGLE)
         )
         toggle.click()
+    
+    

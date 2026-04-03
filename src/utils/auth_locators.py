@@ -35,6 +35,7 @@ class AccountSettingLocators:
     # 페이지 이동
     ACCOUNT_SETTING_BTN = (By.XPATH, "//span[text()='계정 관리']")
     TABLE_LOADED = (By.XPATH, "//td[text()='이름']")
+    BILLING_HISTORY = (By.XPATH, "//span[text()='결제 내역']")
 
     # 프로필 이미지
     PROFILE_IMAGE_ICON = (By.CSS_SELECTOR, '[data-testid="pen-to-squareIcon"]')
