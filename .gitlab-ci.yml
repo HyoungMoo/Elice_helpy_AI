@@ -17,13 +17,11 @@ run_qa_push:
   script:
     - mkdir -p reports/logs reports/screenshots reports/downloads
     - CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'tests/*.py' 'tests/**/*.py' | grep -v test_clipboard_format_preserved.py | tr '\n' ' ')
-    - if [ -n "$CHANGED" ]; then xvfb-run pytest --tb=short --junitxml=reports/result.xml $CHANGED || true; else echo "변경된 테스트 없음"; fi
+    - if [ -n "$CHANGED" ]; then xvfb-run pytest --tb=short $CHANGED || true; else echo "변경된 테스트 없음"; fi
   artifacts:
-    when: always
+    when: on_failure
     paths:
-      - reports/
-    reports:
-      junit: reports/result.xml
+      - reports/screenshots
     expire_in: 1 week
 
 run_qa_schedule:
