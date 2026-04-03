@@ -73,7 +73,7 @@ class AgentPage:
                 system_prompt_input.send_keys(Keys.DELETE)
                 system_prompt_input.send_keys(system_prompt)
 
-            # 포커스 이동 (만들기 버튼 활성화를 위해) << 이거 나중에 다른 방법 없는지 찾아보기
+            # 포커스 이동 (만들기 버튼 활성화를 위해)
             system_prompt_input.send_keys(Keys.TAB)
             self.logger.info("규칙 입력 완료 - 포커스 이동")
             time.sleep(3)

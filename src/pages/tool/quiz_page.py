@@ -73,8 +73,8 @@ class QuizPage:
         btn = self.wait.until(
             EC.presence_of_element_located(QuizLocators.SUBMIT_BTN)
         )
-        if not btn.is_enabled(): # 버튼 비활성화 확인 -> 클릭 생략 /// 이거 밑에 따로 함수 있음 나중에 정리
-            self.logger.info("생성 버튼 비활성화")
+        if not btn.is_enabled(): # 필수값 미입력시 오류 방지
+            self.logger.info("생성 버튼 비활성화 → 클릭 생략")
             return
         btn.click()
 
@@ -83,7 +83,7 @@ class QuizPage:
             WebDriverWait(self.driver, 3).until(
                 EC.visibility_of_element_located(CommonLocators.DIALOG)
             )
-            self.logger.info("팝업 감지 -> 다시 생성 시도")
+            self.logger.info("팝업 감지 → 다시 생성 시도")
 
             self.driver.execute_script("""
             document.querySelectorAll('[role="tooltip"]').forEach(el => el.remove());
@@ -96,10 +96,16 @@ class QuizPage:
             self.logger.info("다시 생성 클릭 완료")
 
         except TimeoutException:
-            self.logger.info("팝업 없음 -> 정상 진행")
+            self.logger.info("팝업 없음 → 정상 진행")
 
+    # 퀴즈 생성 성공 확인 함수
     def verify_quiz_generated(self):
-        try:
+        try: # 이전 퀴즈 생성 결과 대비
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located(CommonLocators.STOP_BTN)
+            )
+            self.logger.info("생성 중 확인됨 (중지 버튼 감지)")
+
             WebDriverWait(self.driver, 300).until(
                 EC.visibility_of_element_located(QuizLocators.SUCCESS_MSG)
             )
@@ -119,6 +125,11 @@ class QuizPage:
         except Exception as e:
             self.logger.info(f"에러 메시지 없음: {e}")
             return None
+        
+    # 생성 버튼 비활성화 확인 함수
+    def check_submit_button_disabled(self):
+        btn = self.driver.find_element(*QuizLocators.SUBMIT_BTN)
+        return not btn.is_enabled()
     
     # 생성 중 입력란 비활성화 확인 함수
     def check_inputs_disabled_during_creation(self):
@@ -141,8 +152,7 @@ class QuizPage:
             is_content_disabled = not content.is_enabled()
             self.logger.info(f"주제 입력 비활성화 여부: {is_content_disabled}")
 
-            btn = self.driver.find_element(*QuizLocators.SUBMIT_BTN)
-            is_btn_disabled = not btn.is_enabled()
+            is_btn_disabled = self.check_submit_button_disabled()
             self.logger.info(f"생성 버튼 비활성화 여부: {is_btn_disabled}")
 
             return all([is_option_disabled, is_difficulty_disabled, is_content_disabled, is_btn_disabled])
@@ -150,11 +160,6 @@ class QuizPage:
         except Exception as e:
             self.logger.info(f"요소 확인 실패: {e}")
             return False
-
-    # 생성 버튼 비활성화 확인 함수
-    def check_submit_button_disabled(self):
-        btn = self.driver.find_element(*QuizLocators.SUBMIT_BTN)
-        return not btn.is_enabled()
     
     # 생성 도중 중지 함수
     def stop_creation(self):
@@ -181,5 +186,27 @@ class QuizPage:
 
     # 생성 도중 네트워크 오류 발생 시 알림 메시지 함수
     def get_network_error_message(self):
-        # TODO: 버그 수정 후 실제 에러 메시지 요소 구현
+        # TODO: 기능 추가 후 실제 에러 메시지 요소 구현
         return None
+    
+    # 답안 항목 수 카운트 함수
+    def get_answer_item_count(self):
+        try:
+            items = self.wait.until(
+                EC.presence_of_all_elements_located(QuizLocators.ANSWER_ITEM) 
+            )
+            self.logger.info(f"답안 항목 수: {len(items)}")
+            return len(items)
+        except Exception as e:
+            self.logger.info(f"답안 항목 없음: {e}")
+            return 0
+        
+    # 정답 항목 수 카운트 함수
+    def get_correct_answer_count(self):
+        try:
+            correct_items = self.driver.find_elements(*QuizLocators.CORRECT_ANSWER_ITEM) 
+            self.logger.info(f"정답 항목 수: {len(correct_items)}")
+            return len(correct_items)
+        except Exception as e:
+            self.logger.info(f"정답 항목 없음: {e}")
+            return 0

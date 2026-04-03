@@ -66,7 +66,7 @@ class PptPage:
        
         # 심층 모드 온/오프 (선택)
         if simple_mode is not None: # true(심층)/false(심플)
-            toggle = self.driver.find_element(*PptLocators.SIMPLE_MODE_TOGGLE) # value 값이 true(심플모드) 착각 ㄴㄴ
+            toggle = self.driver.find_element(*PptLocators.SIMPLE_MODE_TOGGLE) # value 값이 true(심플모드) 착각 놉
             is_simple = toggle.is_selected()  # checked 속성 유무 확인, 체크 되어있으면 True, 아니면 False
 
             if is_simple != simple_mode:
@@ -90,7 +90,7 @@ class PptPage:
             WebDriverWait(self.driver, 3).until(
                 EC.visibility_of_element_located(CommonLocators.DIALOG)
             )
-            self.logger.info("팝업 감지 -> 다시 생성 시도")
+            self.logger.info("팝업 감지 → 다시 생성 시도")
 
             self.driver.execute_script("""
             document.querySelectorAll('[role="tooltip"]').forEach(el => el.remove());
@@ -103,7 +103,7 @@ class PptPage:
             self.logger.info("다시 생성 클릭 완료")
 
         except TimeoutException: 
-            self.logger.info("팝업 없음 -> 정상 진행")
+            self.logger.info("팝업 없음 → 정상 진행")
 
         self.logger.info("PPT 생성 완료")
         

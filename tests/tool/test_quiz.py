@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from src.pages.tool.tool_page import ToolPage
 from src.pages.tool.quiz_page import QuizPage
@@ -70,7 +72,7 @@ def test_quiz_create_no_content(quiz_ready):
     assert is_btn_disabled, "주제 미입력 시 생성 버튼이 활성화되어 있음"
     logger.info("생성 버튼 비활성화 확인 완료")
 
-# 유형별 정상 생성 확인
+# 유형별 정상 생성 확인 및 정상 적용 확인
 @pytest.mark.parametrize("option_type", [
     "객관식(단일 선택)",
     "객관식(복수 선택)",
@@ -88,6 +90,21 @@ def test_quiz_create_by_option_type(quiz_ready, option_type):
     quiz_page.verify_quiz_generated()
     logger.info(f"퀴즈 생성 성공 - 유형: {option_type}")
 
+    item_count = quiz_page.get_answer_item_count() # 답안 항목 개수
+    correct_count = quiz_page.get_correct_answer_count() # 정답 개수
+
+    if option_type == "객관식(단일 선택)":
+        assert item_count >= 2, f"항목 개수 오류(2개 이상 X), 실제: {item_count}"
+        assert correct_count == 1, f"정답 개수 오류(1개 X), 실제: {correct_count}"
+    elif option_type == "객관식(복수 선택)":
+        assert item_count >= 2, f"항목 개수 오류(2개 이상 X), 실제: {item_count}"
+        assert correct_count >= 2, f"정답 개수 오류(2개 이상 X), 실제: {correct_count}"
+    elif option_type == "주관식":
+        assert item_count == 1, f"항목 개수 오류(1개 X), 실제: {item_count}"
+        assert correct_count == 1, f"정답 개수 오류(1개 X), 실제: {correct_count}"
+
+    logger.info(f"퀴즈 형식 검증 완료 - 유형: {option_type}, 항목: {item_count}, 정답: {correct_count}")
+    
 # 난이도별 테스트
 @pytest.mark.parametrize("difficulty", ["상", "중", "하"])
 def test_quiz_create_by_difficulty(quiz_ready, difficulty):

@@ -25,6 +25,7 @@ def created_agent(logged_in_driver):
     tool_page.remove_tooltip() # 팝업 제거
     return name
 
+# 필수값(이름, 규칙) 입력
 def test_agent_create_required_only(created_agent):
     logger.info("에이전트 생성 테스트 완료 - 필수값 모두 입력")
 

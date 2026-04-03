@@ -1,17 +1,15 @@
 from selenium.webdriver.common.by import By
 
-
+# 공통
 class CommonLocators:
-    # 공통 버튼
+
     STOP_BTN = (By.XPATH, "//button[.//*[@data-testid='stopIcon']]")
     RETRY_BTN = (By.CSS_SELECTOR, "[role='dialog'] button[type='submit']")
     
-    # 공통 팝업
     DIALOG = (By.CSS_SELECTOR, "[role='dialog']")
     TOOLTIP = (By.CSS_SELECTOR, "[role='tooltip']")
-    
-    # 공통 메시지
-    STOP_ALERT = (By.XPATH, "//div[@role='alert']")
+
+    STOP_ALERT = (By.XPATH, "//div[@role='alert' and .//div[contains(text(),'요청에 의해 답변 생성을 중지했습니다.')]]")
     ALERT = (By.CSS_SELECTOR, "[role='alert']")
     ERROR_MSG = (By.CSS_SELECTOR, "p.MuiFormHelperText-root.Mui-error[id$='-helper-text']")
 
@@ -39,6 +37,9 @@ class QuizLocators:
     OPTION_TYPE_SELECT = (By.ID, "mui-component-select-quiz_configs.0.option_type")
     DIFFICULTY_SELECT = (By.ID, "mui-component-select-quiz_configs.0.difficulty")
     CONTENT_INPUT = (By.NAME, "content")
+    
+    ANSWER_ITEM = (By.CSS_SELECTOR, "div[role='button'][data-answer]") # 주관식 1개
+    CORRECT_ANSWER_ITEM = (By.CSS_SELECTOR, "div[role='button'][data-answer='true']") # 객관식 단일/복수
     
     SUBMIT_BTN = (By.XPATH, "//button[@type='submit' and @form='tool-factory-create_quiz_from_context']")
     
