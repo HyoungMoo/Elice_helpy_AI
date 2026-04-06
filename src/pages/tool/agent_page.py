@@ -202,7 +202,7 @@ class AgentPage:
         edit_btn.click()
         self.logger.info(f"에이전트 수정 페이지 이동: {name}")
     
-    # 삭제 함수 
+    # 삭제 함수 — confirm 클릭 직후 toast를 즉시 캡처
     def delete_agent(self, name: str):
         delete_btn = self.wait.until(
             EC.element_to_be_clickable(AgentLocators.agent_delete_btn(name))
@@ -210,23 +210,25 @@ class AgentPage:
         delete_btn.click()
         self.logger.info(f"에이전트 삭제 버튼 클릭: {name}")
 
-        # 삭제 확인 팝업
         confirm_btn = self.wait.until(
             EC.element_to_be_clickable(AgentLocators.DELETE_CONFIRM_BTN)
         )
         confirm_btn.click()
         self.logger.info("삭제 확인 클릭 완료")
-        
-    # 삭제 메시지 확인 함수     
-    def is_agent_deleted(self):
+
+        # toast는 클릭 직후 잠깐만 표시되므로 여기서 바로 캡처
         try:
-            alert = WebDriverWait(self.driver, 15).until(
+            alert = WebDriverWait(self.driver, 10).until(
                 EC.visibility_of_element_located(CommonLocators.ALERT)
             )
-            return "에이전트가 삭제되었습니다." in alert.text
+            self._delete_success = "에이전트가 삭제되었습니다." in alert.text
         except Exception as e:
-            self.logger.info(f"삭제 완료 알림 없음: {e}")
-            return False
+            self.logger.info(f"삭제 toast 캡처 실패: {e}")
+            self._delete_success = False
+
+    # 삭제 메시지 확인 함수 — delete_agent() 내부에서 캡처한 결과 반환
+    def is_agent_deleted(self):
+        return getattr(self, '_delete_success', False)
     
     # 에이전트 목록 유무 확인 함수       
     def is_agent_in_list(self, name: str, should_exist: bool = True):

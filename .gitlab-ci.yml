@@ -1,6 +1,5 @@
 stages:
   - test
-  - deploy
 
 run_qa_push:
   stage: test
@@ -83,23 +82,10 @@ run_qa_schedule:
   artifacts:
     when: always
     paths:
-      - reports/
+      - reports/allure-report/
+      - reports/screenshots/
+      - reports/result.xml
     reports:
       junit: reports/result.xml
     expire_in: 1 week
 
-pages:
-  stage: deploy
-  tags:
-    - "#1team"
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-  dependencies:
-    - run_qa_schedule
-  script:
-    - mkdir -p public
-    - cp -r reports/allure-report/* public/
-  artifacts:
-    paths:
-      - public
-    expire_in: 1 week

@@ -48,24 +48,26 @@ class TestScrollLockAndLongAnswer:
         # ── 3. 채팅창 스크롤 정보 가져오는 함수 ─────────────────────
         # 이 서비스는 채팅창이 .ew8d2wp0 클래스 div 내부에서 스크롤됨
         # window.scrollBy 는 이 서비스에서 작동하지 않음
-        # sh: 채팅창 전체 높이
-        # st: 현재 스크롤된 위치
-        # ch: 현재 화면에 보이는 채팅창 높이
+        # sh: 채팅창 전체 높이 / st: 현재 스크롤 위치 / ch: 화면에 보이는 높이
         def get_scroll_info():
-            return driver.execute_script("""
-                const el = document.querySelector('.ew8d2wp0');
-                return {
-                    sh: el.scrollHeight,
-                    st: el.scrollTop,
-                    ch: el.clientHeight
-                };
-            """)
+            try:
+                result = driver.execute_script("""
+                    const el = document.querySelector('.ew8d2wp0');
+                    if (!el) return null;
+                    return { sh: el.scrollHeight, st: el.scrollTop, ch: el.clientHeight };
+                """)
+                return result
+            except Exception:
+                return None
 
         def check_position_fixed(label, fixed_st, seconds=3):
             """스크롤 위치가 고정되어 있는지 일정 시간 동안 확인"""
             for i in range(seconds):
                 time.sleep(1)
-                current_st = get_scroll_info()['st']
+                info = get_scroll_info()
+                if info is None:
+                    continue
+                current_st = info['st']
                 assert abs(fixed_st - current_st) < 20, \
                     f"❌ [CHAT-01-003] {label} — {i+1}초 후 화면 위치가 흔들립니다. (변화량: {abs(fixed_st - current_st)}px)"
             print(f"  ✅ [CHAT-01-003] {label} 위치 고정 확인 완료")
@@ -73,11 +75,13 @@ class TestScrollLockAndLongAnswer:
         # ── 4. 답변이 충분히 쌓일 때까지 대기 ───────────────────────
         # scrollHeight 가 화면 높이의 3배 이상이면 답변이 충분히 쌓인 것
         print("  ⏳ 답변이 충분히 쌓일 때까지 대기 중...")
+        info = None
         for _ in range(60):  # 최대 60초 대기
             info = get_scroll_info()
-            if info['sh'] > info['ch'] * 3:
+            if info and info['sh'] > info['ch'] * 3:
                 break
             time.sleep(1)
+        assert info is not None, "❌ 채팅 컨테이너(.ew8d2wp0)를 찾을 수 없습니다."
         print(f"  ✅ 답변 충분히 쌓임 (전체높이: {info['sh']}px, 화면높이: {info['ch']}px)")
 
         chat_container = driver.find_element(By.CSS_SELECTOR, ".ew8d2wp0")
@@ -90,10 +94,10 @@ class TestScrollLockAndLongAnswer:
         actions.scroll_to_element(chat_container).scroll_by_amount(0, 400).perform()
         time.sleep(1)
 
-        info = get_scroll_info()
-        print(f"  현재 스크롤 위치: {info['st']}px")
+        info = get_scroll_info() or {}
+        print(f"  현재 스크롤 위치: {info.get('st', '?')}px")
 
-        check_position_fixed("아래로 스크롤", info['st'])
+        check_position_fixed("아래로 스크롤", info.get('st', 0))
 
         # ── 6. 위로 스크롤 후 위치 고정 확인 ────────────────────────
         # 실제 사용자가 마우스 휠로 위로 올리는 동작 재현
@@ -102,8 +106,8 @@ class TestScrollLockAndLongAnswer:
         actions.scroll_to_element(chat_container).scroll_by_amount(0, -800).perform()
         time.sleep(1)
 
-        info = get_scroll_info()
-        dist_from_bottom = info['sh'] - (info['st'] + info['ch'])
+        info = get_scroll_info() or {}
+        dist_from_bottom = info.get('sh', 0) - (info.get('st', 0) + info.get('ch', 0))
         print(f"  현재 바닥과의 거리: {dist_from_bottom}px")
         assert dist_from_bottom > 200, \
             "❌ [CHAT-01-003] 위로 올렸으나 화면이 강제로 하단을 추적 중입니다!"
