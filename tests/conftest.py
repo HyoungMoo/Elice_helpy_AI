@@ -36,7 +36,7 @@ def driver():
 def logged_in_driver(driver):
     login_page = LoginPage(driver)
     login_page.go_to_login_page()
-    login_page.login("user_2") # 각자 계정 입력
+    login_page.login("user_2")
     return driver
 
 @pytest.fixture
