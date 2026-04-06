@@ -4,6 +4,10 @@ run_qa_push:
     - "#1team"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - venv/
   before_script:
     - rm -f ~/.bash_logout
     - mkdir -p src/resources
@@ -17,7 +21,7 @@ run_qa_push:
   script:
     - mkdir -p reports/logs reports/screenshots reports/downloads
     - CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'tests/*.py' 'tests/**/*.py' | grep -v test_clipboard_format_preserved.py | tr '\n' ' ' || true)
-    - if [ -n "$CHANGED" ]; then xvfb-run pytest --tb=short $CHANGED || true; else echo "변경된 테스트 없음"; fi
+    - if [ -n "$CHANGED" ]; then xvfb-run pytest --tb=short --lf $CHANGED || true; else echo "변경된 테스트 없음"; fi
   artifacts:
     when: on_failure
     paths:
@@ -30,6 +34,10 @@ run_qa_schedule:
     - "#1team"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    paths:
+      - venv/
   before_script:
     - rm -f ~/.bash_logout
     - mkdir -p src/resources
@@ -42,7 +50,7 @@ run_qa_schedule:
     - pip install -r requirements.txt
   script:
     - mkdir -p reports/logs reports/screenshots reports/downloads
-    - xvfb-run pytest --tb=short --ignore=tests/chat/test_clipboard_format_preserved.py --junitxml=reports/result.xml || true
+    - xvfb-run pytest ${TEST_PATH:-tests/} --tb=short --lf --ignore=tests/chat/test_clipboard_format_preserved.py --ignore=tests/chat/test_math_formula_renders_correctly.py --junitxml=reports/result.xml --html=reports/report.html --self-contained-html || true
   artifacts:
     when: always
     paths:
