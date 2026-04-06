@@ -66,7 +66,7 @@ class PptPage:
        
         # 심층 모드 온/오프 (선택)
         if simple_mode is not None: # true(심층)/false(심플)
-            toggle = self.driver.find_element(*PptLocators.SIMPLE_MODE_TOGGLE) # value 값이 true(심플모드) 착각 놉
+            toggle = self.driver.find_element(*PptLocators.SIMPLE_MODE_TOGGLE) # value 값이 true(심플모드) 착각 놉 
             is_simple = toggle.is_selected()  # checked 속성 유무 확인, 체크 되어있으면 True, 아니면 False
 
             if is_simple != simple_mode:

@@ -16,9 +16,6 @@ def test_signup_email_button_opens_form(fresh_driver):
     assert signup_page.is_signup_form_displayed(), "회원가입 폼이 화면에 표시되지 않습니다."
 
     # 4. 이메일, 비밀번호, 이름 입력
-    # 이메일  qa4team0106@elicer.com
-    # 비밀번호 qa4team0106!!
-    # 이름 정은하회원가입테스트
     assert signup_page.fill_signup_form(
         email="qa4team54540@elicer.com",
         password="qa4team5454!!",
