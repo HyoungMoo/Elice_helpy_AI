@@ -66,7 +66,7 @@ class PptPage:
        
         # 심층 모드 온/오프 (선택)
         if simple_mode is not None: # true(심층)/false(심플)
-            toggle = self.driver.find_element(*PptLocators.SIMPLE_MODE_TOGGLE) # value 값이 true(심플모드) 착각 놉 
+            toggle = self.driver.find_element(*PptLocators.SIMPLE_MODE_TOGGLE)
             is_simple = toggle.is_selected()  # checked 속성 유무 확인, 체크 되어있으면 True, 아니면 False
 
             if is_simple != simple_mode:
@@ -228,3 +228,26 @@ class PptPage:
     def get_network_error_message(self):
         # TODO: 버그 수정 후 실제 에러 메시지 요소 구현
         return None
+
+    # 슬라이드 수 / 섹션 수 오류 메시지 확인
+    def get_slide_count_error_message(self):
+        try:
+            error = self.wait.until(
+                EC.visibility_of_element_located(PptLocators.SLIDES_COUNT_ERROR_MSG)
+            )
+            self.logger.info(f"슬라이드 수 에러 메시지: {error.text}")
+            return error.text
+        except Exception as e:
+            self.logger.info(f"에러 메시지 없음: {e}")
+            return None
+
+    def get_section_count_error_message(self):
+        try:
+            error = self.wait.until(
+                EC.visibility_of_element_located(PptLocators.SECTION_COUNT_ERROR_MSG)
+            )
+            self.logger.info(f"섹션 수 에러 메시지: {error.text}")
+            return error.text
+        except Exception as e:
+            self.logger.info(f"에러 메시지 없음: {e}")
+            return None

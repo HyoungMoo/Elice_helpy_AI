@@ -26,6 +26,8 @@ class PptLocators:
     SECTION_COUNT_INPUT = (By.NAME, "section_count")
     SIMPLE_MODE_TOGGLE = (By.NAME, "simple_mode")
     
+    SLIDES_COUNT_ERROR_MSG = (By.XPATH, "//input[@name='slides_count']/following::p[contains(@class,'Mui-error')][1]")
+    SECTION_COUNT_ERROR_MSG = (By.XPATH, "//input[@name='section_count']/following::p[contains(@class,'Mui-error')][1]")
     SUBMIT_BTN = (By.XPATH, "//button[@type='submit' and @form='tool-factory-create_pptx']")
     DOWNLOAD_BTN = (By.XPATH, "//a[contains(text(),'생성 결과 다운받기')]")
     

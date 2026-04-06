@@ -144,3 +144,43 @@ def test_ppt_network_timeout(ppt_ready, logged_in_driver):
             "uploadThroughput": -1,
         })
         logger.info("네트워크 스로틀링 해제 완료")
+
+# 슬라이드 수 경계값 테스트
+@pytest.mark.parametrize("slides_count, expected_msg", [
+    ("2", "3 이상 50 이하로 입력해주세요."),
+    ("51", "3 이상 50 이하로 입력해주세요.")
+])
+def test_ppt_slide_count_out_of_range(ppt_ready, slides_count, expected_msg):
+    ppt_page = ppt_ready
+    logger.info(f"슬라이드 수 경계값 테스트 - 입력값: {slides_count}")
+
+    ppt_page.create_ppt(topic="파이썬 기초", slides_count=slides_count)
+
+    error_msg = ppt_page.get_slide_count_error_message()
+    assert error_msg == expected_msg, f"에러 메시지가 올바르지 않음: {error_msg}"
+    logger.info(f"에러 메시지 확인 완료: {error_msg}")
+
+# 섹션 수 경계값 테스트
+@pytest.mark.parametrize("section_count, expected_msg", [
+    ("9", "1 이상 8 이하로 입력해주세요.")
+])
+def test_ppt_section_count_out_of_range(ppt_ready, section_count, expected_msg):
+    ppt_page = ppt_ready
+    logger.info(f"섹션 수 경계값 테스트 - 입력값: {section_count}")
+
+    ppt_page.create_ppt(topic="파이썬 기초", section_count=section_count)
+
+    error_msg = ppt_page.get_section_count_error_message()
+    assert error_msg == expected_msg, f"에러 메시지가 올바르지 않음: {error_msg}"
+    logger.info(f"에러 메시지 확인 완료: {error_msg}")
+    
+# 주제 최대 길이 초과 입력 시 오류 메시지 확인
+def test_ppt_topic_max_length_exceeded(ppt_ready):
+    ppt_page = ppt_ready
+    logger.info("PPT 생성 테스트 시작 - 주제 최대 길이 초과")
+
+    ppt_page.create_ppt(topic="a" * 501)
+
+    error_msg = ppt_page.get_topic_error_message()
+    assert error_msg == "1자 이상 500자 이하로 입력해주세요.", f"에러 메시지가 올바르지 않음: {error_msg}"
+    logger.info(f"에러 메시지 확인 완료: {error_msg}")
