@@ -31,4 +31,3 @@ reports/downloads/*
 credentials.json
 
 # 공통 설정
-conftest.py
