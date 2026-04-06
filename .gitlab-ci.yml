@@ -50,8 +50,8 @@ run_qa_schedule:
     - pip install -r requirements.txt
     # allure CLI 설치
     - curl -o allure.tgz -L https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
-    - tar -zxvf allure.tgz -C /opt/
-    - ln -sf /opt/allure-2.27.0/bin/allure /usr/local/bin/allure
+    - sudo tar -zxvf allure.tgz -C /opt/
+    - sudo ln -sf /opt/allure-2.27.0/bin/allure /usr/local/bin/allure
   script:
     - mkdir -p reports/logs reports/screenshots reports/downloads reports/allure-results
     - xvfb-run pytest ${TEST_PATH:-tests/} --tb=short --lf --ignore=tests/chat/test_clipboard_format_preserved.py --ignore=tests/chat/test_math_formula_renders_correctly.py --junitxml=reports/result.xml --alluredir=reports/allure-results || true
