@@ -9,8 +9,10 @@ def driver():
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--window-size=1920,1080")
-    #options.add_argument('--start-maximized')          # 브라우저 창을 시작 시 최대화
-    options.add_experimental_option("detach", True)
+    options.add_argument("--no-sandbox")           # CI 리눅스 환경 필수
+    options.add_argument("--disable-dev-shm-usage") # 공유 메모리 부족 방지
+    options.add_argument("--disable-gpu")
+    # detach=True 제거: CI에서 Chrome 프로세스가 테스트 종료 후에도 남아 메모리 누수 유발
 
     download_path = str(Path("reports/downloads").resolve())
 
