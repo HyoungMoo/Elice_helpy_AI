@@ -25,6 +25,10 @@ def driver():
     driver = webdriver.Chrome(options=options)
     driver.implicitly_wait(5)
     yield driver
+    try:
+        driver.quit()
+    except Exception:
+        pass
 
 @pytest.fixture
 def logged_in_driver(driver):
