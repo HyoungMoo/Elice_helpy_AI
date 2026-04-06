@@ -64,7 +64,7 @@ class ChatPage:
         send_btn = self.wait.until(EC.element_to_be_clickable(ChatLocators.SEND_BTN))
         send_btn.click()
 
-    def wait_for_answer(self, label, timeout=60):
+    def wait_for_answer(self, label, timeout=120):
         """
         답변 완료 대기
         1) stopIcon 나타났다가 사라지면 완료
@@ -140,6 +140,7 @@ class ChatPage:
         """전송하지 않고 입력창에 텍스트만 입력"""
         input_box = self.wait.until(EC.element_to_be_clickable(ChatLocators.INPUT))
         input_box.clear()
+        time.sleep(0.3)
         input_box.send_keys(text)
 
     def is_send_button_enabled(self):

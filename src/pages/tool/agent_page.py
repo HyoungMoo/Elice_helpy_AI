@@ -220,7 +220,7 @@ class AgentPage:
     # 삭제 메시지 확인 함수     
     def is_agent_deleted(self):
         try:
-            alert = self.wait.until(
+            alert = WebDriverWait(self.driver, 15).until(
                 EC.visibility_of_element_located(CommonLocators.ALERT)
             )
             return "에이전트가 삭제되었습니다." in alert.text

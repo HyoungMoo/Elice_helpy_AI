@@ -1,3 +1,7 @@
+stages:
+  - test
+  - deploy
+
 run_qa_push:
   stage: test
   tags:
@@ -20,8 +24,28 @@ run_qa_push:
     - pip install -r requirements.txt
   script:
     - mkdir -p reports/logs reports/screenshots reports/downloads
-    - CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'tests/*.py' 'tests/**/*.py' | grep -v test_clipboard_format_preserved.py | tr '\n' ' ' || true)
-    - if [ -n "$CHANGED" ]; then xvfb-run pytest --tb=short --lf $CHANGED || true; else echo "변경된 테스트 없음"; fi
+    - TEST_CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'tests/*.py' 'tests/**/*.py' | grep -v test_clipboard_format_preserved.py | tr '\n' ' ' || true)
+    - SRC_CHAT=$(git diff --name-only HEAD~1 HEAD -- 'src/pages/chat/*.py' | tr '\n' ' ' || true)
+    - SRC_TOOL=$(git diff --name-only HEAD~1 HEAD -- 'src/pages/tool/*.py' | tr '\n' ' ' || true)
+    - SRC_AUTH=$(git diff --name-only HEAD~1 HEAD -- 'src/pages/auth/*.py' | tr '\n' ' ' || true)
+    - SRC_OTHER=$(git diff --name-only HEAD~1 HEAD -- 'src/pages/system/*.py' 'src/utils/*.py' 'src/config.py' | tr '\n' ' ' || true)
+    - |
+      if [ -n "$SRC_OTHER" ]; then
+        echo "공통 모듈 변경 → 전체 테스트 실행"
+        xvfb-run pytest tests/ --tb=short --ignore=tests/chat/test_clipboard_format_preserved.py --ignore=tests/chat/test_math_formula_renders_correctly.py || true
+      else
+        TARGETS=""
+        [ -n "$SRC_CHAT" ] && TARGETS="$TARGETS tests/chat/"
+        [ -n "$SRC_TOOL" ] && TARGETS="$TARGETS tests/tool/"
+        [ -n "$SRC_AUTH" ] && TARGETS="$TARGETS tests/auth/"
+        [ -n "$TEST_CHANGED" ] && TARGETS="$TARGETS $TEST_CHANGED"
+        if [ -n "$TARGETS" ]; then
+          echo "변경 감지 → 실행: $TARGETS"
+          xvfb-run pytest --tb=short $TARGETS || true
+        else
+          echo "변경된 테스트 없음"
+        fi
+      fi
   artifacts:
     when: on_failure
     paths:
@@ -54,7 +78,7 @@ run_qa_schedule:
     - sudo ln -sf /opt/allure-2.27.0/bin/allure /usr/local/bin/allure
   script:
     - mkdir -p reports/logs reports/screenshots reports/downloads reports/allure-results
-    - xvfb-run pytest ${TEST_PATH:-tests/} --tb=short --lf --ignore=tests/chat/test_clipboard_format_preserved.py --ignore=tests/chat/test_math_formula_renders_correctly.py --junitxml=reports/result.xml --alluredir=reports/allure-results || true
+    - xvfb-run pytest ${TEST_PATH:-tests/} --tb=short --ignore=tests/chat/test_clipboard_format_preserved.py --ignore=tests/chat/test_math_formula_renders_correctly.py --junitxml=reports/result.xml --alluredir=reports/allure-results || true
     - allure generate reports/allure-results -o reports/allure-report --clean || true
   artifacts:
     when: always
@@ -62,4 +86,20 @@ run_qa_schedule:
       - reports/
     reports:
       junit: reports/result.xml
+    expire_in: 1 week
+
+pages:
+  stage: deploy
+  tags:
+    - "#1team"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  dependencies:
+    - run_qa_schedule
+  script:
+    - mkdir -p public
+    - cp -r reports/allure-report/* public/
+  artifacts:
+    paths:
+      - public
     expire_in: 1 week
