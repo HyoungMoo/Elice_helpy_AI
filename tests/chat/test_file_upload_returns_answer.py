@@ -1,4 +1,5 @@
 import os
+import allure
 
 from src.pages.chat.chat_page import ChatPage
 
@@ -57,6 +58,11 @@ class TestFileUpload:
         print(f"  ✅ [{label}] 답변 확인 완료 (길이: {len(answer.text)}자)")
         print(f"  답변 미리보기: {answer.text[:100]}...")
 
+    @allure.epic("채팅")
+    @allure.feature("파일 업로드")
+    @allure.story("이미지 파일")
+    @allure.title("JPG 파일 업로드 후 이미지 내용 답변 확인")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_jpg_file_upload_returns_image_description(self, logged_in_driver):
         """JPG 파일 업로드 시 이미지 내용을 인식하고 답변하는지 확인"""
         chat_page = ChatPage(logged_in_driver)
@@ -64,6 +70,11 @@ class TestFileUpload:
         self._upload_file_and_ask(chat_page, f["path"], f["question"], f["label"])
         print("\n🎉 JPG 파일 업로드 테스트 통과!")
 
+    @allure.epic("채팅")
+    @allure.feature("파일 업로드")
+    @allure.story("문서 파일")
+    @allure.title("PDF 파일 업로드 후 내용 요약 답변 확인")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_pdf_file_upload_returns_summary(self, logged_in_driver):
         """PDF 파일 업로드 시 내용을 요약해서 답변하는지 확인"""
         chat_page = ChatPage(logged_in_driver)
@@ -71,6 +82,11 @@ class TestFileUpload:
         self._upload_file_and_ask(chat_page, f["path"], f["question"], f["label"])
         print("\n🎉 PDF 파일 업로드 테스트 통과!")
 
+    @allure.epic("채팅")
+    @allure.feature("파일 업로드")
+    @allure.story("엑셀 파일")
+    @allure.title("XLSX 파일 업로드 후 데이터 분석 답변 확인")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_xlsx_file_upload_returns_data_analysis(self, logged_in_driver):
         """XLSX 파일 업로드 시 데이터를 분석해서 답변하는지 확인"""
         chat_page = ChatPage(logged_in_driver)

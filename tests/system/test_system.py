@@ -1,4 +1,5 @@
 import pytest
+import allure
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -36,6 +37,11 @@ LANGUAGE_UI_TEXTS = {
 # ─────────────────────────────
 # SYS-01-001 ~ 003: 언어 변경
 # ─────────────────────────────
+@allure.epic("시스템")
+@allure.feature("언어 설정")
+@allure.story("언어 변경")
+@allure.title("언어 변경 후 사이드바 UI 텍스트 변환 확인")
+@allure.severity(allure.severity_level.NORMAL)
 @pytest.mark.parametrize("lang_text", [
     "American English",
     "日本語 (日本)",
@@ -84,6 +90,11 @@ def test_language_change_ui(logged_in_driver, lang_text):
 # ─────────────────────────────
 # SYS-01-004: 대화 유지
 # ─────────────────────────────
+@allure.epic("시스템")
+@allure.feature("언어 설정")
+@allure.story("언어 변경")
+@allure.title("언어 변경 시 대화 내용 유지 확인")
+@allure.severity(allure.severity_level.NORMAL)
 def test_chat_state_preserved_on_language_change(logged_in_driver):
     driver = logged_in_driver
     chat = ChatPage(driver)
@@ -106,6 +117,11 @@ def test_chat_state_preserved_on_language_change(logged_in_driver):
 # ─────────────────────────────
 # SYS-01-005: 새로고침 후 언어 유지
 # ─────────────────────────────
+@allure.epic("시스템")
+@allure.feature("언어 설정")
+@allure.story("언어 유지")
+@allure.title("새로고침 후 언어 설정 유지 확인")
+@allure.severity(allure.severity_level.NORMAL)
 def test_language_persistence_after_refresh(logged_in_driver):
     driver = logged_in_driver
     wait = WebDriverWait(driver, 15)
@@ -142,6 +158,11 @@ def test_language_persistence_after_refresh(logged_in_driver):
 # ─────────────────────────────
 # SYS-01-005: 브라우저 언어 자동 감지
 # ─────────────────────────────
+@allure.epic("시스템")
+@allure.feature("언어 설정")
+@allure.story("언어 유지")
+@allure.title("브라우저 언어 자동 감지 확인")
+@allure.severity(allure.severity_level.MINOR)
 def test_browser_language_auto_detection(logged_in_driver):
     driver = logged_in_driver
     wait = WebDriverWait(driver, 15)
@@ -181,6 +202,11 @@ def test_browser_language_auto_detection(logged_in_driver):
 # ─────────────────────────────
 # SYS-02-001: 네트워크 복구
 # ─────────────────────────────
+@allure.epic("시스템")
+@allure.feature("네트워크")
+@allure.story("네트워크 복구")
+@allure.title("네트워크 차단 후 복구 시 대화 유지 확인")
+@allure.severity(allure.severity_level.CRITICAL)
 def test_network_recovery(logged_in_driver):
     driver = logged_in_driver
     chat = ChatPage(driver)
@@ -220,6 +246,11 @@ def test_network_recovery(logged_in_driver):
 # ─────────────────────────────
 # SYS-02-002: 멀티탭
 # ─────────────────────────────
+@allure.epic("시스템")
+@allure.feature("멀티탭")
+@allure.story("멀티탭 처리")
+@allure.title("멀티탭 동시 질문 처리 확인")
+@allure.severity(allure.severity_level.NORMAL)
 def test_multi_tab_processing(logged_in_driver):
     driver = logged_in_driver
 

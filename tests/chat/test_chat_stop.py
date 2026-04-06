@@ -1,4 +1,5 @@
 import pytest
+import allure
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -17,6 +18,11 @@ STOP_BTN_XPATH = ChatLocators.STOP_BTN[1]
 # ────────────────────────────────────────────────────────────────
 class TestChatStop:
 
+    @allure.epic("채팅")
+    @allure.feature("답변 생성")
+    @allure.story("생성 중단")
+    @allure.title("답변 생성 중단 후 입력창 즉시 활성화 확인")
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_input_becomes_active_after_stopping_generation(self, logged_in_driver):
         """답변 생성 중단 후 입력창이 즉시 활성화되는지 확인"""
         driver = logged_in_driver

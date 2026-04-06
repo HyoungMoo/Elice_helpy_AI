@@ -1,6 +1,7 @@
 import time
 
 import pytest
+import allure
 from src.pages.tool.tool_page import ToolPage
 from src.pages.tool.quiz_page import QuizPage
 from src.utils.logger import setup_logger
@@ -17,7 +18,11 @@ def quiz_ready(logged_in_driver):
 
     return quiz_page
 
-# 퀴즈 생성 중 중지
+@allure.epic("도구")
+@allure.feature("퀴즈")
+@allure.story("퀴즈 생성")
+@allure.title("퀴즈 생성 중 중지 확인")
+@allure.severity(allure.severity_level.NORMAL)
 def test_quiz_creation_with_stop(quiz_ready):
     quiz_page = quiz_ready
     logger.info("quiz 생성 중 중지 테스트 시작")
@@ -35,7 +40,11 @@ def test_quiz_creation_with_stop(quiz_ready):
     assert "중지" in alert_text
     logger.info("퀴즈 생성 중 중지 테스트 완료")
     
-# 필수값 모두 입력 (정상 생성)
+@allure.epic("도구")
+@allure.feature("퀴즈")
+@allure.story("퀴즈 생성")
+@allure.title("필수값 입력 후 정상 생성 확인")
+@allure.severity(allure.severity_level.CRITICAL)
 def test_quiz_create_required_only(quiz_ready):
     quiz_page = quiz_ready
     logger.info("퀴즈 생성 테스트 시작 - 필수값 모두 입력")
@@ -53,7 +62,11 @@ def test_quiz_create_required_only(quiz_ready):
     quiz_page.verify_quiz_generated()
     logger.info("퀴즈 생성 성공 - 필수값 모두 입력")
 
-# 주제 미입력 시 생성 버튼 비활성화/에러 메시지 출력 확인
+@allure.epic("도구")
+@allure.feature("퀴즈")
+@allure.story("퀴즈 생성")
+@allure.title("주제 미입력 시 에러 메시지 및 버튼 비활성화 확인")
+@allure.severity(allure.severity_level.NORMAL)
 def test_quiz_create_no_content(quiz_ready):
     quiz_page = quiz_ready
     logger.info("퀴즈 생성 테스트 시작 - 주제 미입력")
@@ -72,7 +85,11 @@ def test_quiz_create_no_content(quiz_ready):
     assert is_btn_disabled, "주제 미입력 시 생성 버튼이 활성화되어 있음"
     logger.info("생성 버튼 비활성화 확인 완료")
 
-# 유형별 정상 생성 확인 및 정상 적용 확인
+@allure.epic("도구")
+@allure.feature("퀴즈")
+@allure.story("퀴즈 생성")
+@allure.title("유형별 퀴즈 생성 및 형식 확인")
+@allure.severity(allure.severity_level.NORMAL)
 @pytest.mark.parametrize("option_type", [
     "객관식(단일 선택)",
     "객관식(복수 선택)",
@@ -105,7 +122,11 @@ def test_quiz_create_by_option_type(quiz_ready, option_type):
 
     logger.info(f"퀴즈 형식 검증 완료 - 유형: {option_type}, 항목: {item_count}, 정답: {correct_count}")
     
-# 난이도별 테스트
+@allure.epic("도구")
+@allure.feature("퀴즈")
+@allure.story("퀴즈 생성")
+@allure.title("난이도별 퀴즈 생성 확인")
+@allure.severity(allure.severity_level.NORMAL)
 @pytest.mark.parametrize("difficulty", ["상", "중", "하"])
 def test_quiz_create_by_difficulty(quiz_ready, difficulty):
     quiz_page = quiz_ready
@@ -119,7 +140,11 @@ def test_quiz_create_by_difficulty(quiz_ready, difficulty):
     quiz_page.verify_quiz_generated()
     logger.info(f"퀴즈 생성 성공 - 난이도: {difficulty}")
 
-# 다양한 입력값(특수문자, 긴 문자열) 테스트
+@allure.epic("도구")
+@allure.feature("퀴즈")
+@allure.story("퀴즈 생성")
+@allure.title("특수문자 및 긴 입력값 처리 확인")
+@allure.severity(allure.severity_level.MINOR)
 @pytest.mark.parametrize("case", [
     {"name": "정상", "content": "영단어 테스트"},
     {"name": "특수문자", "content": "!@#$%^&*()_+"},
@@ -137,7 +162,11 @@ def test_quiz_create_special_and_long_input(quiz_ready, case):
     quiz_page.verify_quiz_generated()
     logger.info(f"퀴즈 생성 성공 - {case['name']} 입력")
     
-# 퀴즈 생성 중 네트워크 오류 발생 테스트
+@allure.epic("도구")
+@allure.feature("퀴즈")
+@allure.story("퀴즈 생성")
+@allure.title("네트워크 오류 시 에러 메시지 출력 확인")
+@allure.severity(allure.severity_level.MINOR)
 @pytest.mark.xfail(reason="네트워크 오류 시 에러 메시지 미출력 버그")
 def test_quiz_network_timeout(quiz_ready, logged_in_driver):
     quiz_page = quiz_ready

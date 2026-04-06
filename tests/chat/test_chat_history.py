@@ -1,4 +1,5 @@
 import pytest
+import allure
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -29,6 +30,11 @@ class TestChatHistoryManagement:
         self.wait = WebDriverWait(self.driver, 30)
         self.chat_page = ChatPage(self.driver)
 
+    @allure.epic("채팅")
+    @allure.feature("대화 히스토리")
+    @allure.story("대화 생성 및 정렬")
+    @allure.title("대화 생성 후 사이드바 최신순 정렬 확인")
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_01_sidebar_order_and_creation(self):
         """[CHAT-02-001] 대화 생성 및 사이드바 최신순 정렬 검증"""
         print("\n[단계 1] 대화 생성 및 순서 확인 시작")
@@ -54,6 +60,11 @@ class TestChatHistoryManagement:
         assert created_titles[-1] in latest_title, "❌ 최신 대화가 상단에 없음"
         print("  ✅ 사이드바 순서 및 최신성 검증 완료")
 
+    @allure.epic("채팅")
+    @allure.feature("대화 히스토리")
+    @allure.story("대화 관리")
+    @allure.title("대화 조회/이름변경/검색/삭제 통합 확인")
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_02_history_search_edit_delete(self):
         """[CHAT-02-002~006] 대화 조회, 이름 변경, 검색, 삭제 통합 검증"""
         print("\n[단계 2] 히스토리 관리 기능(CRUD) 검증 시작")

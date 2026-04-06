@@ -1,5 +1,6 @@
 from pathlib import Path
 import pytest
+import allure
 from src.pages.tool.tool_page import ToolPage
 from src.pages.tool.agent_page import AgentPage
 from src.pages.auth.logout_page import LogoutPage
@@ -25,11 +26,19 @@ def created_agent(logged_in_driver):
     tool_page.remove_tooltip() # 팝업 제거
     return name
 
-# 필수값(이름, 규칙) 입력
+@allure.epic("도구")
+@allure.feature("에이전트")
+@allure.story("에이전트 생성")
+@allure.title("필수값(이름, 규칙) 입력 후 생성 성공")
+@allure.severity(allure.severity_level.CRITICAL)
 def test_agent_create_required_only(created_agent):
     logger.info("에이전트 생성 테스트 완료 - 필수값 모두 입력")
 
-# 필수값(이름) 누락 입력
+@allure.epic("도구")
+@allure.feature("에이전트")
+@allure.story("에이전트 생성")
+@allure.title("필수값(이름) 누락 시 오류 메시지 출력")
+@allure.severity(allure.severity_level.NORMAL)
 def test_agent_create_missing_name(logged_in_driver):
     logger.info("에이전트 생성 테스트 시작 - 필수값 이름 누락")
     driver = logged_in_driver
@@ -46,7 +55,11 @@ def test_agent_create_missing_name(logged_in_driver):
     assert "이름을 입력해주세요" in error
     logger.info(f"이름 누락 오류 메시지 확인 완료: {error}")
     
-# 필수값(규칙) 누락 입력
+@allure.epic("도구")
+@allure.feature("에이전트")
+@allure.story("에이전트 생성")
+@allure.title("필수값(규칙) 누락 시 오류 메시지 출력")
+@allure.severity(allure.severity_level.NORMAL)
 def test_agent_create_missing_system_prompt(logged_in_driver):
     logger.info("에이전트 생성 테스트 시작 - 필수값 규칙 누락")
     driver = logged_in_driver
@@ -63,7 +76,11 @@ def test_agent_create_missing_system_prompt(logged_in_driver):
     assert "규칙을 입력해주세요" in error
     logger.info(f"규칙 누락 오류 메시지 확인 완료: {error}")
    
-# 선택값(한줄 소개, 카테고리, 시작 대화, 기능) 입력 
+@allure.epic("도구")
+@allure.feature("에이전트")
+@allure.story("에이전트 생성")
+@allure.title("선택값(소개, 카테고리, 시작대화, 기능) 포함 생성 성공")
+@allure.severity(allure.severity_level.NORMAL)
 def test_agent_create_with_all_optional(logged_in_driver):
     logger.info("에이전트 생성 테스트 시작 - 선택값 입력")
     driver = logged_in_driver
@@ -88,7 +105,11 @@ def test_agent_create_with_all_optional(logged_in_driver):
 BASE_DIR = Path(__file__).parent
 PROJECT_ROOT = BASE_DIR.parent.parent
 
-# 정상 파일 업로드 테스트
+@allure.epic("도구")
+@allure.feature("에이전트")
+@allure.story("에이전트 생성")
+@allure.title("파일 업로드 포함 에이전트 생성 성공")
+@allure.severity(allure.severity_level.NORMAL)
 def test_agent_create_with_file(logged_in_driver):
     logger.info("에이전트 생성 테스트 시작 - 파일 업로드")
     driver = logged_in_driver
@@ -110,7 +131,11 @@ def test_agent_create_with_file(logged_in_driver):
     assert agent_page.is_agent_created(), "에이전트 생성 실패"
     logger.info("에이전트 생성 성공 - 파일 업로드")
 
-# 시작 대화 최대 4개 확인 테스트    
+@allure.epic("도구")
+@allure.feature("에이전트")
+@allure.story("에이전트 생성")
+@allure.title("시작 대화 최대 4개 입력 가능 확인")
+@allure.severity(allure.severity_level.MINOR)
 def test_agent_conversation_starters_max(logged_in_driver):
     logger.info("에이전트 생성 테스트 시작 - 시작 대화 최대 4개")
     driver = logged_in_driver
@@ -130,7 +155,11 @@ def test_agent_conversation_starters_max(logged_in_driver):
     assert agent_page.is_agent_created(), "에이전트 생성 실패"
     logger.info("에이전트 생성 성공 - 시작 대화 4개 입력 확인")
     
-# 필수값 모두 입력 (정상 생성)
+@allure.epic("도구")
+@allure.feature("에이전트")
+@allure.story("에이전트 생성")
+@allure.title("필수값 입력 후 정상 생성 확인")
+@allure.severity(allure.severity_level.CRITICAL)
 def test_agent_create_required_only(logged_in_driver):
     logger.info("에이전트 생성 테스트 시작 - 필수값 모두 입력")
     driver = logged_in_driver
@@ -148,7 +177,11 @@ def test_agent_create_required_only(logged_in_driver):
     assert agent_page.is_agent_created(), "에이전트 생성 실패 - 성공 알림 미출력"
     logger.info("에이전트 생성 테스트 완료 - 필수값 모두 입력")
     
-# 수정/수정 후 반영 테스트  
+@allure.epic("도구")
+@allure.feature("에이전트")
+@allure.story("에이전트 수정")
+@allure.title("에이전트 수정 후 목록 반영 확인")
+@allure.severity(allure.severity_level.CRITICAL)
 def test_agent_edit(logged_in_driver, created_agent):
     logger.info("에이전트 수정 테스트 시작")
     driver = logged_in_driver
@@ -175,7 +208,11 @@ def test_agent_edit(logged_in_driver, created_agent):
     assert agent_page.is_agent_in_list("수정된 에이전트"), "수정된 에이전트가 목록에 없음"
     logger.info("수정 후 목록 반영 확인 완료")
     
-# 에이전트 삭제 테스트
+@allure.epic("도구")
+@allure.feature("에이전트")
+@allure.story("에이전트 삭제")
+@allure.title("에이전트 삭제 후 목록에서 제거 확인")
+@allure.severity(allure.severity_level.CRITICAL)
 def test_agent_delete(logged_in_driver, created_agent):
     logger.info("에이전트 삭제 테스트 시작")
     driver = logged_in_driver
@@ -192,7 +229,11 @@ def test_agent_delete(logged_in_driver, created_agent):
     assert agent_page.is_agent_in_list(created_agent, should_exist=False), "삭제된 에이전트가 목록에 남아있음"
     logger.info("에이전트 삭제 성공")
 
-# 나만 보기 설정 확인 테스트   
+@allure.epic("도구")
+@allure.feature("에이전트")
+@allure.story("에이전트 공개 설정")
+@allure.title("나만 보기 설정 시 다른 계정에 미노출 확인")
+@allure.severity(allure.severity_level.NORMAL)
 def test_agent_private_visibility(logged_in_driver):
     logger.info("에이전트 나만 보기 테스트 시작")
     driver = logged_in_driver
@@ -233,7 +274,11 @@ def test_agent_private_visibility(logged_in_driver):
     assert agent_page.is_agent_in_list(name, should_exist=False), "user_1에게 비공개 에이전트가 노출됨"
     logger.info("나만 보기 확인 완료 - user_1에게 미노출")
 
-# 기관 내 공유 설정 확인 테스트     
+@allure.epic("도구")
+@allure.feature("에이전트")
+@allure.story("에이전트 공개 설정")
+@allure.title("기관 내 공유 설정 시 다른 계정에 노출 확인")
+@allure.severity(allure.severity_level.NORMAL)
 def test_agent_organization_visibility(logged_in_driver):
     logger.info("에이전트 기관 내 공유 테스트 시작")
     driver = logged_in_driver

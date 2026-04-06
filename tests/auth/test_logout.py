@@ -1,4 +1,5 @@
 import pytest
+import allure
 from selenium import webdriver
 from src.pages.auth.logout_page import LogoutPage
 from selenium.webdriver.common.by import By
@@ -6,7 +7,11 @@ from src.pages.auth.login_page import LoginPage
 from src.pages.auth.accountsetting_page import AccountSetting
 # pytest tests/auth/test_logout.py
 
-# 로그아웃 후 다른 계정으로 로그인
+@allure.epic("인증")
+@allure.feature("로그아웃")
+@allure.story("로그아웃 후 재로그인")
+@allure.title("로그아웃 후 다른 계정으로 로그인 확인")
+@allure.severity(allure.severity_level.CRITICAL)
 def test_logout_after_other_auth_login(logged_in_driver):
     driver = logged_in_driver
     logout_page = LogoutPage(driver)
@@ -17,7 +22,11 @@ def test_logout_after_other_auth_login(logged_in_driver):
     logout_page.sign_different_account( )
     login_page.login()
 
-# 로그인 자동 완성 기록 삭제
+@allure.epic("인증")
+@allure.feature("로그아웃")
+@allure.story("자동완성 기록 삭제")
+@allure.title("로그아웃 후 로그인 자동완성 기록 삭제 확인")
+@allure.severity(allure.severity_level.NORMAL)
 def test_logout_remove_history(logged_in_driver):
     driver = logged_in_driver
     logout_page = LogoutPage(driver)

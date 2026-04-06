@@ -1,11 +1,16 @@
 import pytest
+import allure
 from src.pages.auth.login_page import LoginPage
 from selenium.webdriver.common.keys import Keys
 from src.utils.auth_locators import CommonAuthLocators, LoginLocators
 import time
 import pyperclip
 # 로그인 정보 입력 위해 자동로그인 아닌 fresh_driver 사용
-# 기본 로그인 테스트
+@allure.epic("인증")
+@allure.feature("로그인")
+@allure.story("정상 로그인")
+@allure.title("이메일/비밀번호 입력 후 로그인 성공")
+@allure.severity(allure.severity_level.BLOCKER)
 def test_login(fresh_driver):
     driver = fresh_driver
     login_page = LoginPage(driver)
@@ -24,7 +29,11 @@ def test_login(fresh_driver):
     # 로그인 버튼 클릭
     assert login_page.click_login_button(),"로그인 실패"
 
-# 마스킹 상태 비밀번호 카피
+@allure.epic("인증")
+@allure.feature("로그인")
+@allure.story("비밀번호 복사")
+@allure.title("마스킹 상태 비밀번호 복사 확인")
+@allure.severity(allure.severity_level.MINOR)
 @pytest.mark.xfail(reason="비밀번호 복사 기능 Selenium 환경에서 확인 불가")
 def test_login_copy_password(fresh_driver):
     driver = fresh_driver

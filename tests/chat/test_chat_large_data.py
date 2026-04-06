@@ -1,4 +1,5 @@
 import os
+import allure
 from selenium.webdriver.common.by import By
 
 from src.pages.chat.chat_page import ChatPage
@@ -11,6 +12,11 @@ from src.pages.chat.chat_page import ChatPage
 # ────────────────────────────────────────────────────────────────
 class TestChatLargeData:
 
+    @allure.epic("채팅")
+    @allure.feature("파일 업로드")
+    @allure.story("대량 데이터 처리")
+    @allure.title("대용량 텍스트 파일 요약 시 필수 섹션 및 키워드 포함 확인")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_summary_contains_required_sections_and_keywords(self, logged_in_driver):
         """대용량 텍스트 파일 내용 전송 후 요약 시 필수 섹션과 키워드가 포함되는지 확인"""
         driver = logged_in_driver

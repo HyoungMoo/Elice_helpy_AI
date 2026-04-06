@@ -1,4 +1,5 @@
 import pytest
+import allure
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -14,6 +15,11 @@ from src.pages.chat.chat_page import ChatPage
 # ────────────────────────────────────────────────────────────────
 class TestNewChat:
 
+    @allure.epic("채팅")
+    @allure.feature("대화 세션")
+    @allure.story("새 대화")
+    @allure.title("기존 대화방 진입 후 새 대화 버튼 클릭 시 빈 화면 전환 확인")
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_new_chat_session_starts_empty_after_entering_existing_chat(self, logged_in_driver):
         """기존 대화방 진입 후 새 대화 버튼 클릭 시 빈 화면으로 전환되는지 확인"""
         driver = logged_in_driver

@@ -1,5 +1,6 @@
 import time
 import pytest
+import allure
 from src.pages.tool.tool_page import ToolPage
 from src.pages.tool.ppt_page import PptPage
 from pathlib import Path
@@ -17,7 +18,11 @@ def ppt_ready(logged_in_driver):
 
     return ppt_page
 
-# 필수값(topic) 미입력 시 생성 버튼 비활성화 확인
+@allure.epic("도구")
+@allure.feature("PPT")
+@allure.story("PPT 생성")
+@allure.title("필수값(주제) 미입력 시 에러 메시지 및 버튼 비활성화 확인")
+@allure.severity(allure.severity_level.NORMAL)
 def test_ppt_create_no_topic(ppt_ready):
     ppt_page = ppt_ready
     logger.info("PPT 생성 테스트 시작 - 필수값 미입력")
@@ -32,7 +37,11 @@ def test_ppt_create_no_topic(ppt_ready):
     assert is_btn_disabled, "필수값(주제) 미입력 시 생성 버튼이 활성화되어 있음"
     logger.info("생성 버튼 비활성화 확인 완료")
 
-# PPT 생성 중 중지
+@allure.epic("도구")
+@allure.feature("PPT")
+@allure.story("PPT 생성")
+@allure.title("PPT 생성 중 중지 확인")
+@allure.severity(allure.severity_level.NORMAL)
 def test_ppt_creation_with_stop(ppt_ready):
     ppt_page = ppt_ready
     logger.info("PPT 생성 중 중지 테스트 시작")
@@ -47,7 +56,11 @@ def test_ppt_creation_with_stop(ppt_ready):
         f"예상과 다른 알림 메시지: {alert_text}"
     logger.info(f"정상 중지 확인 - 알림 메시지: {alert_text}")
 
-# 필수값(topic)만 입력 / 생성 중 버튼 비활성화 확인 / 정상 다운로드 확인
+@allure.epic("도구")
+@allure.feature("PPT")
+@allure.story("PPT 생성")
+@allure.title("필수값만 입력 후 정상 생성 및 다운로드 확인")
+@allure.severity(allure.severity_level.CRITICAL)
 def test_ppt_create_required_only(ppt_ready):
     ppt_page = ppt_ready
     logger.info("PPT 생성 테스트 시작 - 필수값만 입력")
@@ -62,7 +75,11 @@ def test_ppt_create_required_only(ppt_ready):
     ppt_page.ppt_download()
     logger.info("PPT 다운로드 확인 완료")
 
-# 심층 모드 ON으로 PPT 생성 확인
+@allure.epic("도구")
+@allure.feature("PPT")
+@allure.story("PPT 생성")
+@allure.title("심층 모드 ON 생성 확인")
+@allure.severity(allure.severity_level.NORMAL)
 def test_ppt_create_deep_mode(ppt_ready):
     ppt_page = ppt_ready
     logger.info("PPT 생성 테스트 시작 - 심층 모드")
@@ -72,7 +89,11 @@ def test_ppt_create_deep_mode(ppt_ready):
     ppt_page.verify_ppt_generated()
     logger.info("PPT 생성 성공 - 심층 모드")
 
-# 선택값 입력(슬라이드 수, 섹션 수 포함) / 정상 다운로드 확인 / 슬라이드 수 확인
+@allure.epic("도구")
+@allure.feature("PPT")
+@allure.story("PPT 생성")
+@allure.title("슬라이드 수 입력값과 실제 생성 수 일치 확인")
+@allure.severity(allure.severity_level.NORMAL)
 @pytest.mark.xfail(reason="슬라이드 수가 입력값과 일치하지 않는 버그")
 def test_ppt_slide_count_validation(ppt_ready):
     ppt_page = ppt_ready
@@ -98,7 +119,11 @@ def test_ppt_slide_count_validation(ppt_ready):
     assert slide_count == int(input_slides), \
         f"슬라이드 수 불일치 (입력값: {input_slides}, 실제: {slide_count})"
 
-# 특수문자 및 긴 입력값 입력 시 정상 처리 확인
+@allure.epic("도구")
+@allure.feature("PPT")
+@allure.story("PPT 생성")
+@allure.title("특수문자 및 긴 입력값 정상 처리 확인")
+@allure.severity(allure.severity_level.MINOR)
 def test_ppt_create_special_and_long(ppt_ready):
     ppt_page = ppt_ready
     logger.info("PPT 생성 테스트 시작 - 특수문자 및 긴 입력값")
@@ -113,7 +138,11 @@ def test_ppt_create_special_and_long(ppt_ready):
 
     ppt_page.verify_ppt_generated()
 
-# PPT 생성 중 네트워크 오류 발생 테스트    
+@allure.epic("도구")
+@allure.feature("PPT")
+@allure.story("PPT 생성")
+@allure.title("네트워크 오류 시 에러 메시지 출력 확인")
+@allure.severity(allure.severity_level.MINOR)
 @pytest.mark.xfail(reason="네트워크 오류 시 에러 메시지 미출력 버그")
 def test_ppt_network_timeout(ppt_ready, logged_in_driver):
     ppt_page = ppt_ready
@@ -145,7 +174,11 @@ def test_ppt_network_timeout(ppt_ready, logged_in_driver):
         })
         logger.info("네트워크 스로틀링 해제 완료")
 
-# 슬라이드 수 경계값 테스트
+@allure.epic("도구")
+@allure.feature("PPT")
+@allure.story("PPT 생성")
+@allure.title("슬라이드 수 경계값 오류 메시지 확인")
+@allure.severity(allure.severity_level.NORMAL)
 @pytest.mark.parametrize("slides_count, expected_msg", [
     ("2", "3 이상 50 이하로 입력해주세요."),
     ("51", "3 이상 50 이하로 입력해주세요.")
@@ -160,7 +193,11 @@ def test_ppt_slide_count_out_of_range(ppt_ready, slides_count, expected_msg):
     assert error_msg == expected_msg, f"에러 메시지가 올바르지 않음: {error_msg}"
     logger.info(f"에러 메시지 확인 완료: {error_msg}")
 
-# 섹션 수 경계값 테스트
+@allure.epic("도구")
+@allure.feature("PPT")
+@allure.story("PPT 생성")
+@allure.title("섹션 수 경계값 오류 메시지 확인")
+@allure.severity(allure.severity_level.NORMAL)
 @pytest.mark.parametrize("section_count, expected_msg", [
     ("9", "1 이상 8 이하로 입력해주세요.")
 ])
@@ -174,7 +211,11 @@ def test_ppt_section_count_out_of_range(ppt_ready, section_count, expected_msg):
     assert error_msg == expected_msg, f"에러 메시지가 올바르지 않음: {error_msg}"
     logger.info(f"에러 메시지 확인 완료: {error_msg}")
     
-# 주제 최대 길이 초과 입력 시 오류 메시지 확인
+@allure.epic("도구")
+@allure.feature("PPT")
+@allure.story("PPT 생성")
+@allure.title("주제 최대 길이 초과 시 오류 메시지 확인")
+@allure.severity(allure.severity_level.NORMAL)
 def test_ppt_topic_max_length_exceeded(ppt_ready):
     ppt_page = ppt_ready
     logger.info("PPT 생성 테스트 시작 - 주제 최대 길이 초과")
