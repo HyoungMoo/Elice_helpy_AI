@@ -1,4 +1,4 @@
-# login_page.py
+# login_page.py - auth module
 from src.config import Config
 import json
 from selenium.webdriver.remote.webdriver import WebDriver
