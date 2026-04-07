@@ -1,6 +1,7 @@
 stages:
   - test
 
+# ── push 잡: main 브랜치 push 시 변경된 파일 감지 후 관련 테스트만 선별 실행 ──
 run_qa_push:
   stage: test
   tags:
@@ -23,16 +24,21 @@ run_qa_push:
     - pip install -r requirements.txt
   script:
     - mkdir -p reports/logs reports/screenshots reports/downloads
+    # 변경된 테스트 파일 감지
     - TEST_CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'tests/*.py' 'tests/**/*.py' | grep -v test_clipboard_format_preserved.py | tr '\n' ' ' || true)
+    # 변경된 src/pages/ 파일 감지 (영역별)
     - SRC_CHAT=$(git diff --name-only HEAD~1 HEAD -- 'src/pages/chat/*.py' | tr '\n' ' ' || true)
     - SRC_TOOL=$(git diff --name-only HEAD~1 HEAD -- 'src/pages/tool/*.py' | tr '\n' ' ' || true)
     - SRC_AUTH=$(git diff --name-only HEAD~1 HEAD -- 'src/pages/auth/*.py' | tr '\n' ' ' || true)
+    # 공통 모듈 변경 감지 (변경 시 전체 실행)
     - SRC_OTHER=$(git diff --name-only HEAD~1 HEAD -- 'src/pages/system/*.py' 'src/utils/*.py' 'src/config.py' | tr '\n' ' ' || true)
     - |
       if [ -n "$SRC_OTHER" ]; then
+        # 공통 모듈 변경 → 전체 테스트 실행 (회귀 테스트)
         echo "공통 모듈 변경 → 전체 테스트 실행"
         xvfb-run pytest tests/ --tb=short --ignore=tests/chat/test_clipboard_format_preserved.py --ignore=tests/chat/test_math_formula_renders_correctly.py || true
       else
+        # 변경된 영역만 타겟으로 선별 실행
         TARGETS=""
         [ -n "$SRC_CHAT" ] && TARGETS="$TARGETS tests/chat/"
         [ -n "$SRC_TOOL" ] && TARGETS="$TARGETS tests/tool/"
@@ -48,9 +54,10 @@ run_qa_push:
   artifacts:
     when: on_failure
     paths:
-      - reports/screenshots
+      - reports/screenshots   # 실패 시 스크린샷만 저장
     expire_in: 1 week
 
+# ── schedule 잡: 전체 테스트 정기 자동 실행 (회귀 테스트) + Allure 리포트 생성 ──
 run_qa_schedule:
   stage: test
   tags:
@@ -71,20 +78,22 @@ run_qa_schedule:
     - source venv/bin/activate
     - pip install --upgrade pip
     - pip install -r requirements.txt
-    # allure CLI 설치
+    # Allure CLI 설치
     - curl -o allure.tgz -L https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
     - sudo tar -zxvf allure.tgz -C /opt/
     - sudo ln -sf /opt/allure-2.27.0/bin/allure /usr/local/bin/allure
   script:
     - mkdir -p reports/logs reports/screenshots reports/downloads reports/allure-results
+    # 전체 테스트 실행 (Linux 미지원 테스트 제외)
     - xvfb-run pytest ${TEST_PATH:-tests/} --tb=short --ignore=tests/chat/test_clipboard_format_preserved.py --ignore=tests/chat/test_math_formula_renders_correctly.py --junitxml=reports/result.xml --alluredir=reports/allure-results || true
+    # Allure HTML 리포트 생성
     - allure generate reports/allure-results -o reports/allure-report --clean || true
   artifacts:
     when: always
     paths:
-      - reports/allure-report/
-      - reports/screenshots/
-      - reports/result.xml
+      - reports/allure-report/  # HTML 리포트
+      - reports/screenshots/    # 실패 스크린샷
+      - reports/result.xml      # JUnit XML (GitLab CI 결과 표시용)
     reports:
       junit: reports/result.xml
     expire_in: 1 week
