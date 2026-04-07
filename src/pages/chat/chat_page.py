@@ -1,5 +1,6 @@
 import time
 import pytest
+# chat page module
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from src.utils.chat_locators import ChatLocators
