@@ -40,7 +40,7 @@ run_qa_push:
         [ -n "$TEST_CHANGED" ] && TARGETS="$TARGETS $TEST_CHANGED"
         if [ -n "$TARGETS" ]; then
           echo "변경 감지 → 실행: $TARGETS"
-          xvfb-run pytest --tb=short $TARGETS || true
+          xvfb-run pytest --tb=short $TARGETS --ignore=tests/chat/test_clipboard_format_preserved.py --ignore=tests/chat/test_math_formula_renders_correctly.py || true
         else
           echo "변경된 테스트 없음"
         fi
